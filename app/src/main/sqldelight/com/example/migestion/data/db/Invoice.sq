@@ -1,0 +1,30 @@
+-- invoice.sq
+CREATE TABLE invoiceEntity (
+    id INTEGER NOT NULL PRIMARY KEY,
+    date TEXT DEFAULT CURRENT_TIMESTAMP,
+    payment_method_id INTEGER REFERENCES paymentMethodEntity(id) ON DELETE CASCADE,
+    customer_id INTEGER REFERENCES customerEntity(id) ON DELETE CASCADE
+);
+
+-- Obtener todas las facturas
+selectAll:
+SELECT * FROM invoiceEntity;
+
+-- Obtener una factura por ID
+selectById:
+SELECT * FROM invoiceEntity WHERE id = ?;
+
+-- Insertar una factura
+insert:
+INSERT INTO invoiceEntity (id, date, payment_method_id, customer_id)
+VALUES (?,?, ?, ?);
+
+-- Actualizar los datos de una factura por ID
+update:
+UPDATE invoiceEntity
+SET date = ?, payment_method_id = ?, customer_id = ?
+WHERE id = ?;
+
+-- Obtener el ultimo id en uso
+getMaxId:
+SELECT MAX(id) FROM invoiceEntity;

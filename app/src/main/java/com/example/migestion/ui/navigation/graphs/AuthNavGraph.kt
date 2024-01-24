@@ -4,6 +4,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import com.example.migestion.ui.screens.signinscreen.SignInScreen
+import com.example.migestion.ui.screens.signupscreen.SignUpScreen
 
 fun NavGraphBuilder.authNavGraph(navController: NavHostController) {
     navigation(
@@ -11,6 +13,15 @@ fun NavGraphBuilder.authNavGraph(navController: NavHostController) {
         startDestination = AuthScreen.Login.route
     ) {
         composable(route = AuthScreen.Login.route) {
+            SignInScreen(
+                onSignInClick = {
+                    navController.popBackStack()
+                    navController.navigate(Graph.HOME)
+                },
+                onSignUpClick = {
+                    navController.navigate(AuthScreen.SignUp.route)
+                }
+            )
             /*LoginContent(
                 onClick = {
                     navController.popBackStack()
@@ -25,7 +36,7 @@ fun NavGraphBuilder.authNavGraph(navController: NavHostController) {
             )*/
         }
         composable(route = AuthScreen.SignUp.route) {
-            //ScreenContent(name = AuthScreen.SignUp.route) {}
+            SignUpScreen()
         }
         composable(route = AuthScreen.Forgot.route) {
             //ScreenContent(name = AuthScreen.Forgot.route) {}

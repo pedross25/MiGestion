@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,6 +22,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
@@ -53,14 +55,52 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import com.example.migestion.data.db.CustomerEntity
+import com.example.migestion.model.Response
 import com.example.migestion.ui.components.BarraBusqueda
+import com.example.migestion.ui.components.ProgressBar
+import com.example.migestion.ui.theme.TextGray
 
-data class CustomerEntity(val name: String, val correo: String)
+//data class CustomerEntity(val name: String, val correo: String)
 data class MenuItem(val text: String, @DrawableRes val icon: Int)
 
 @Composable
-fun CustomerScreen() {
+fun CustomerScreen(viewModel: CustomerViewModel = hiltViewModel(), onItemClick: (String) -> Unit) {
 
+    Customers(viewModel = viewModel) {
+        var showClientForm by remember { mutableStateOf(false) }
+
+        if (showClientForm) {
+            ClientForm()
+        }
+
+        Column {
+            BarraBusqueda()
+            CustomerList(customers = it, viewModel = viewModel, onItemClick = {})
+        }
+
+    }
+}
+
+@Composable
+fun Customers(
+    viewModel: CustomerViewModel = hiltViewModel(),
+    productsContent: @Composable (products: List<CustomerEntity>) -> Unit
+) {
+    when (val productsResponse = viewModel.customerResponse) {
+        is Response.Loading -> ProgressBar()
+        is Response.Success -> productsContent(viewModel.filteredCustomers)
+        is Response.Failure -> print(productsResponse.e)
+    }
+}
+
+/*
+@Composable
+fun CustomerScreen() {
+/*
     val customerList = listOf(
         CustomerEntity("John Doe", "john.doe@example.com"),
         CustomerEntity("Jane Smith", "jane.smith@example.com"),
@@ -83,6 +123,7 @@ fun CustomerScreen() {
         CustomerEntity("Lucas Hall", "lucas.hall@example.com"),
         CustomerEntity("Ava Davis", "ava.davis@example.com")
     )
+    */
 
     var showClientForm by remember { mutableStateOf(false) }
 
@@ -94,15 +135,15 @@ fun CustomerScreen() {
         BarraBusqueda()
         CustomerList(customerList) {}
     }
-
-
 }
+ */
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CustomerList(
     customers: List<CustomerEntity>,
     onItemClick: (String) -> Unit,
+    viewModel: CustomerViewModel
 ) {
     /*val items = listOf(
         MenuItem("Llamar", R.drawable.call),
@@ -139,7 +180,7 @@ fun CustomerList(
 
             //val groupedClientes = customers.groupBy { it.businessName.first().uppercaseChar() }
             val groupedClientes: Map<String, List<CustomerEntity>> = customers.groupBy {
-                (it.name.firstOrNull()?.uppercaseChar() ?: "Sin nombre").toString()
+                (it.businessName.firstOrNull()?.uppercaseChar() ?: "Sin nombre").toString()
             }
 
             LazyColumn {
@@ -241,7 +282,7 @@ fun CustomerItem(customer: CustomerEntity, onItemClick: () -> Unit) {
             .clickable(onClick = onItemClick)
     ) {
         Text(
-            text = customer.name,
+            text = customer.businessName,
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 4.dp)
@@ -259,7 +300,7 @@ fun CustomerItem(customer: CustomerEntity, onItemClick: () -> Unit) {
 fun ClientForm() {
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
-    var optionalFields by remember { mutableStateOf(listOf("Field 1", "Field 2", "Field 3")) }
+    var optionalFields by remember { mutableStateOf(listOf("Teléfono", "Dirección", "CP")) }
     var selectedFieldIndex by remember { mutableStateOf(-1) }
     var isAddingField by remember { mutableStateOf(false) }
 
@@ -269,6 +310,7 @@ fun ClientForm() {
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val context = LocalContext.current
+
 
     Column(
         modifier = Modifier
@@ -327,17 +369,26 @@ fun ClientForm() {
                     .fillMaxWidth()
                     .padding(bottom = 8.dp)
             ) {
-                Text(text = field, modifier = Modifier.weight(1f))
-
-                IconButton(
-                    onClick = {
-                        // Editar campo opcional
-                        selectedFieldIndex = index
-                        isAddingField = true
-                    }
-                ) {
-                    Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
-                }
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = {
+                        email = it
+                        isEmailError = it.isEmpty()
+                    },
+                    label = { Text(field) },
+                    isError = isEmailError,
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onNext = {
+                            focusManager.moveFocus(FocusDirection.Down)
+                        }
+                    ),
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(bottom = 8.dp)
+                )
 
                 IconButton(
                     onClick = {
@@ -422,11 +473,11 @@ fun AddOptionalFieldDialog(
     var selectedAttribute by remember { mutableStateOf<String?>(null) }
 
     // Lista de atributos predefinidos
-    val predefinedAttributes = listOf("Attribute 1", "Attribute 2", "Attribute 3")
+    val predefinedAttributes = listOf("CIF", "Dirección", "Ciudad")
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        modifier = Modifier.background(Color.Gray),
+        //modifier = Modifier.background(Color.Gray),
         content = {
             Column {
                 // Mostrar la lista de atributos predefinidos

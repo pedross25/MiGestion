@@ -1,0 +1,32 @@
+
+CREATE TABLE customerEntity (
+    id INTEGER NOT NULL PRIMARY KEY,
+    businessName TEXT NOT NULL,
+    streetAddress TEXT,
+    city TEXT,
+    state TEXT,
+    postalCode TEXT,
+    email TEXT,
+    phoneNumber TEXT,
+    cif TEXT NOT NULL,
+    createdAt TEXT NOT NULL
+);
+
+-- Obtener todos los clientes
+selectAll:
+SELECT * FROM customerEntity;
+
+-- Obtener un cliente por ID
+selectById:
+SELECT * FROM customerEntity WHERE id = ?;
+
+-- Insertar un cliente
+insert:
+INSERT INTO customerEntity (id, businessName, streetAddress, city, state, postalCode, email, phoneNumber, cif, createdAt)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+-- Actualizar los datos de un cliente por ID
+update:
+UPDATE customerEntity
+SET businessName = ?, streetAddress = ?, city = ?, state = ?, postalCode = ?, email = ?, phoneNumber = ?, cif = ?, createdAt = ?
+WHERE id = ?;

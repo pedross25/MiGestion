@@ -7,11 +7,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.example.migestion.ui.navigation.BottomNavItem
-import com.example.migestion.ui.screens.CreateInvoiceScreen
-import com.example.migestion.ui.screens.customerscreen.ClientForm
+import com.example.migestion.ui.screens.createcustomerscreen.CreateCustomerScreen
+import com.example.migestion.ui.screens.createinvoicescreen.CreateInvoiceScreen
 import com.example.migestion.ui.screens.customerscreen.CustomerScreen
 import com.example.migestion.ui.screens.dashboardscreen.DashboardScreen
 import com.example.migestion.ui.screens.invoicescreen.InvoiceScreen
+import com.example.migestion.ui.screens.selectproductsscreen.SelectProduct
+import com.example.migestion.ui.screens.selectproductsscreen.SelectProducts
 
 @Composable
 fun HomeNavGraph(navController: NavHostController) {
@@ -24,7 +26,7 @@ fun HomeNavGraph(navController: NavHostController) {
             DashboardScreen()
         }
         composable(route = BottomNavItem.Customers.screen_route) {
-            CustomerScreen()
+            CustomerScreen(onItemClick = {})
         }
         composable(route = BottomNavItem.InvoiceScreen.screen_route) {
             InvoiceScreen()
@@ -38,12 +40,13 @@ fun NavGraphBuilder.detailsNavGraph(navController: NavHostController) {
         route = Graph.DETAILS,
         startDestination = DetailsScreen.FormularioAltaCliente.route
     ) {
-        /*composable(route = DetailsScreen.FormularioAltaClziente.route) {
+        composable(route = DetailsScreen.FormularioAltaCliente.route) {
         /*ScreenContent(name = DetailsScreen.Information.route) {
                 navController.navigate(DetailsScreen.Overview.route)
             }*/
-            ClientForm()
-        }*/
+            //ClientForm()
+            CreateCustomerScreen(navController)
+        }
         composable(route = DetailsScreen.Overview.route) {
             /*ScreenContent(name = DetailsScreen.Overview.route) {
                 navController.popBackStack(
@@ -53,10 +56,15 @@ fun NavGraphBuilder.detailsNavGraph(navController: NavHostController) {
             }*/
             CreateInvoiceScreen(navController)
         }
+        composable(route = DetailsScreen.SelectProducts.route) {
+            SelectProduct()
+        }
     }
 }
 
 sealed class DetailsScreen(val route: String) {
     object FormularioAltaCliente : DetailsScreen(route = "FORMULARIO")
     object Overview : DetailsScreen(route = "OVERVIEW")
+
+    object SelectProducts: DetailsScreen(route = "SELECCIONAR PRODUCTOS")
 }

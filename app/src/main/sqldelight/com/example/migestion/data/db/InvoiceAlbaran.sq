@@ -1,0 +1,19 @@
+-- invoice_albaran.sq
+CREATE TABLE invoiceAlbaranEntity (
+    factura_id INTEGER REFERENCES invoiceEntity(id) ON DELETE CASCADE,
+    albaran_id INTEGER REFERENCES albaranEntity(id) ON DELETE CASCADE,
+    PRIMARY KEY (factura_id, albaran_id)
+);
+
+-- Obtener todas las relaciones invoice-albaran
+selectAll:
+SELECT * FROM invoiceAlbaranEntity;
+
+-- Insertar una relación invoice-albaran
+insert:
+INSERT INTO invoiceAlbaranEntity (factura_id, albaran_id)
+VALUES (?, ?);
+
+-- Eliminar una relación invoice-albaran por factura_id y albaran_id
+deleteByIds:
+DELETE FROM invoiceAlbaranEntity WHERE factura_id = ? AND albaran_id = ?;

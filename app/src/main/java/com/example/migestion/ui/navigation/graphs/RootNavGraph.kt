@@ -11,9 +11,9 @@ fun RootNavigationGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
         route = Graph.ROOT,
-        startDestination = Graph.HOME       // cambiar por auth
+        startDestination = Graph.AUTHENTICATION       // cambiar por auth
     ) {
-        //authNavGraph(navController = navController)
+        authNavGraph(navController = navController)
         composable(route = Graph.HOME) {
             HomeScreen()
         }

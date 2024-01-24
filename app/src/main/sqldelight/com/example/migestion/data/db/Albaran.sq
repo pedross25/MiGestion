@@ -1,0 +1,60 @@
+-- albaran.sq
+CREATE TABLE albaranEntity (
+    id INTEGER NOT NULL PRIMARY KEY,
+    customer_id INTEGER REFERENCES customerEntity(id) ON DELETE CASCADE,
+    fecha TEXT NOT NULL
+);
+
+-- Obtener todos los albaranes
+selectAll:
+SELECT * FROM albaranEntity;
+
+-- Obtener un albarán por ID
+selectById:
+SELECT * FROM albaranEntity WHERE id = ?;
+
+-- Insertar un albarán
+insert:
+INSERT INTO albaranEntity (customer_id, fecha)
+VALUES (?, ?);
+
+-- Actualizar los datos de un albarán por ID
+update:
+UPDATE albaranEntity
+SET customer_id = ?, fecha = ?
+WHERE id = ?;
+
+selectLastInsertedRowId:
+SELECT last_insert_rowid();
+
+-- Consulta para seleccionar albaranes con productos asociados
+selectAllWithProducts:
+SELECT
+    albaranEntity.id AS id,
+    albaranEntity.customer_id AS customer_id,
+    albaranEntity.fecha AS fecha,
+    GROUP_CONCAT(productEntity.id) AS productIds
+FROM
+    albaranEntity
+LEFT JOIN
+    albaranProductEntity ON albaranEntity.id = albaranProductEntity.albaran_id
+LEFT JOIN
+    productEntity ON albaranProductEntity.product_id = productEntity.id
+GROUP BY
+    albaranEntity.id;
+
+-- Consulta para seleccionar un albarán con sus productos por ID
+selectAlbaranWithProductsById:
+SELECT
+    albaranEntity.id AS id,
+    albaranEntity.customer_id AS customer_id,
+    albaranEntity.fecha AS fecha,
+    productEntity.*
+FROM
+    albaranEntity
+LEFT JOIN
+    albaranProductEntity ON albaranEntity.id = albaranProductEntity.albaran_id
+LEFT JOIN
+    productEntity ON albaranProductEntity.product_id = productEntity.id
+WHERE
+    albaranEntity.id = ?;

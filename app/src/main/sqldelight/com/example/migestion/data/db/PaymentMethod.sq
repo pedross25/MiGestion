@@ -1,0 +1,24 @@
+-- payment_method.sq
+CREATE TABLE paymentMethodEntity (
+    id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL
+);
+
+-- Obtener todos los métodos de pago
+selectAll:
+SELECT * FROM paymentMethodEntity;
+
+-- Obtener un método de pago por ID
+selectById:
+SELECT * FROM paymentMethodEntity WHERE id = ?;
+
+-- Insertar un método de pago
+insert:
+INSERT INTO paymentMethodEntity (name)
+VALUES (?);
+
+-- Actualizar los datos de un método de pago por ID
+update:
+UPDATE paymentMethodEntity
+SET name = ?
+WHERE id = ?;

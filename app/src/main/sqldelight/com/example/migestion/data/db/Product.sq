@@ -1,0 +1,33 @@
+import kotlin.Boolean;
+
+-- product.sq
+CREATE TABLE productEntity (
+    id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    amount INTEGER NOT NULL,
+    price REAL NOT NULL,
+    category TEXT NOT NULL,
+    template INTEGER AS Boolean DEFAULT 0,
+    description TEXT,
+    invoice_id INTEGER REFERENCES invoiceEntity(id) ON DELETE CASCADE,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Obtener todos los productos
+selectAll:
+SELECT * FROM productEntity;
+
+-- Obtener un producto por ID
+selectById:
+SELECT * FROM productEntity WHERE id = ?;
+
+-- Insertar un producto
+insert:
+INSERT INTO productEntity (name, amount, price, category)
+VALUES (?, ?, ?, ?);
+
+-- Actualizar los datos de un producto por ID
+update:
+UPDATE productEntity
+SET name = ?, amount = ?, price = ?, category = ?
+WHERE id = ?;

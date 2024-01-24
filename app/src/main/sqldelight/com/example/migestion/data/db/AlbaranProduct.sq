@@ -1,0 +1,23 @@
+-- albaran_product.sq
+CREATE TABLE albaranProductEntity (
+    albaran_id INTEGER REFERENCES albaranEntity(id) ON DELETE CASCADE,
+    product_id INTEGER REFERENCES productEntity(id) ON DELETE CASCADE,
+    PRIMARY KEY (albaran_id, product_id)
+);
+
+-- Obtener todos los productos asociados a un albarán
+selectAllByAlbaranId:
+SELECT * FROM albaranProductEntity WHERE albaran_id = ?;
+
+-- Obtener todos los albaranes asociados a un producto
+selectAllByProductId:
+SELECT * FROM albaranProductEntity WHERE product_id = ?;
+
+-- Insertar una relación albarán-producto
+insert:
+INSERT INTO albaranProductEntity (albaran_id, product_id)
+VALUES (?, ?);
+
+-- Eliminar una relación albarán-producto por albaran_id y product_id
+deleteByIds:
+DELETE FROM albaranProductEntity WHERE albaran_id = ? AND product_id = ?;
