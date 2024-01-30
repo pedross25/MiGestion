@@ -18,5 +18,6 @@ class AlbaranRemote @Inject constructor(
 
     override suspend fun getAll(): List<AlbaranEntity> {
         TODO("Not yet implemented")
+
     }
 }

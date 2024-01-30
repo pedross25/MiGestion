@@ -2,6 +2,7 @@ package com.example.migestion.data.repositories.productrepository
 
 import com.example.migestion.model.Product
 import com.example.migestion.model.Response
+import kotlinx.coroutines.flow.Flow
 
 typealias Products = List<Product>
 typealias ProductsResponse = Response<Products>
@@ -14,15 +15,17 @@ interface ProductRepository {
     suspend fun getAllProducts(): Response<List<Product>>
 
     suspend fun addProduct(
-        name: String,
-        description: String,
-        imageUrl: String,
-        price: Double
-    ): Product
+        product: Product, persistApi: Boolean = false
+    ): Response<Product>
 
     //suspend fun deleteProductFromFirestore(productId: String): DeleteProductResponse
 
-    suspend fun getProductById(id: Int): Product
+    suspend fun persistProductsFromInvoice(id: Int): Response<List<Product>>
+
+    suspend fun getTemplateProducts(): Response<List<Product>>
+
+    suspend fun getProductsFromInvoice(idInvoice: Int): Flow<Response<List<Product>>>
+
 
     //suspend fun addNewWinBid(productId: String, idBid: String): Response<Boolean>
 }

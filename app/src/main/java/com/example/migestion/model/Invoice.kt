@@ -17,3 +17,10 @@ fun InvoiceEntity.toInvoice(): Invoice = Invoice(
     paymentMethod = payment_method_id?.toInt(),
     customer = customer_id?.toInt()
 )
+
+fun Invoice.toInvoiceEntity(): InvoiceEntity = InvoiceEntity(
+    id = id.toLong(),
+    date = createdAt,
+    payment_method_id = paymentMethod?.toLong(),
+    customer_id = customer?.toLong()
+)

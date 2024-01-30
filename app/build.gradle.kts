@@ -84,6 +84,7 @@ dependencies {
     //sqldelight
     implementation("app.cash.sqldelight:android-driver:2.0.0")
     implementation("app.cash.sqldelight:coroutines-extensions-jvm:2.0.0")
+    implementation("app.cash.sqldelight:coroutines-extensions:2.0.0")
 
     //Hilt
     implementation ("com.google.dagger:hilt-android:2.50")

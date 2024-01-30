@@ -6,11 +6,12 @@ import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import com.example.migestion.data.cache.AlbaranCache
 import com.example.migestion.data.cache.CustomerCache
 import com.example.migestion.data.cache.InvoiceCache
+import com.example.migestion.data.cache.InvoiceWithCustomerCache
+import com.example.migestion.data.cache.ProductCache
 import com.example.migestion.data.db.Database
 import com.example.migestion.data.network.MiGestionHttpClient
 import com.example.migestion.data.remote.AlbaranRemote
 import com.example.migestion.data.remote.CustomerRemote
-import com.example.migestion.data.remote.InvoiceRemote
 import com.example.migestion.data.repositories.albaranrepository.AlbaranRepository
 import com.example.migestion.data.repositories.albaranrepository.AlbaranRepositoryImpl
 import com.example.migestion.data.repositories.albaranrepository.ICacheAlbaran
@@ -22,9 +23,11 @@ import com.example.migestion.data.repositories.customerrepository.CustomerReposi
 import com.example.migestion.data.repositories.customerrepository.ICacheCustomer
 import com.example.migestion.data.repositories.customerrepository.IRemoteCustomer
 import com.example.migestion.data.repositories.invoicerepository.ICacheInvoice
-import com.example.migestion.data.repositories.invoicerepository.IRemoteInvoice
 import com.example.migestion.data.repositories.invoicerepository.InvoiceRepository
 import com.example.migestion.data.repositories.invoicerepository.InvoiceRepositoryImpl
+import com.example.migestion.data.repositories.productrepository.ICacheProduct
+import com.example.migestion.data.repositories.productrepository.ProductRepository
+import com.example.migestion.data.repositories.productrepository.ProductRepositoryImpl
 import com.example.migestion.usecases.GetInvoiceWithCustomer
 import com.example.migestion.usecases.UseCases
 import dagger.Module
@@ -101,6 +104,12 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideProductCache(database: Database): ICacheProduct {
+        return ProductCache(database)
+    }
+
+    @Provides
+    @Singleton
     fun provideAlbaranRepository(cache: ICacheAlbaran, remote: IRemoteAlbaran): AlbaranRepository {
         return AlbaranRepositoryImpl(cache, remote)
     }
@@ -109,6 +118,18 @@ object AppModule {
     @Singleton
     fun provideInvoiceRepository(httpClient: HttpClient, cache: ICacheInvoice): InvoiceRepository {
         return InvoiceRepositoryImpl(httpClient, cache)
+    }
+
+    @Provides
+    @Singleton
+    fun provideProductRepository(httpClient: HttpClient, cache: ICacheProduct): ProductRepository {
+        return ProductRepositoryImpl(cache, httpClient)
+    }
+
+    @Provides
+    @Singleton
+    fun provideInvoiceWithCustomer(database: Database): InvoiceWithCustomerCache {
+        return InvoiceWithCustomerCache(database)
     }
 
     @Provides

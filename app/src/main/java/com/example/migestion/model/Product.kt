@@ -1,7 +1,9 @@
 package com.example.migestion.model
 
 import com.example.migestion.data.db.ProductEntity
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class Product(
     val id: Int,
     val name: String,
@@ -9,7 +11,7 @@ data class Product(
     val price: Double,
     val category: String,
     val createdAt: String?,
-    val template: Boolean?,
+    val template: Boolean,
     val description: String?,
     val invoice: Int?
 )

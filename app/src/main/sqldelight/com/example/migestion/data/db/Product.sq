@@ -7,7 +7,7 @@ CREATE TABLE productEntity (
     amount INTEGER NOT NULL,
     price REAL NOT NULL,
     category TEXT NOT NULL,
-    template INTEGER AS Boolean DEFAULT 0,
+    template INTEGER AS Boolean DEFAULT 0 NOT NULL,
     description TEXT,
     invoice_id INTEGER REFERENCES invoiceEntity(id) ON DELETE CASCADE,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP
@@ -23,11 +23,23 @@ SELECT * FROM productEntity WHERE id = ?;
 
 -- Insertar un producto
 insert:
-INSERT INTO productEntity (name, amount, price, category)
-VALUES (?, ?, ?, ?);
+INSERT INTO productEntity (name, amount, price, category, template, description, invoice_id)
+VALUES (?, ?, ?, ?, ?, ?, ?);
 
 -- Actualizar los datos de un producto por ID
 update:
 UPDATE productEntity
 SET name = ?, amount = ?, price = ?, category = ?
 WHERE id = ?;
+
+-- Obtener todos los productos de una factura
+selectByIdInvoice:
+SELECT *
+FROM productEntity
+WHERE invoice_id = ?;
+
+-- Obtener todos los productos plantilla
+selectTemplateProducts:
+SELECT *
+FROM productEntity
+WHERE template>0;

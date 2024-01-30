@@ -3,7 +3,6 @@ package com.example.migestion.data.repositories.customerrepository
 import android.util.Log
 import com.example.migestion.data.db.CustomerEntity
 import com.example.migestion.model.Customer
-import com.example.migestion.model.Invoice
 import com.example.migestion.model.Response
 import com.example.migestion.model.toCustomer
 import kotlinx.coroutines.Dispatchers

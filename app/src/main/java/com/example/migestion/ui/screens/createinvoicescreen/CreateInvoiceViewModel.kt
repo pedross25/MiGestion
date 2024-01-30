@@ -8,10 +8,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.migestion.data.repositories.customerrepository.CustomerRepository
 import com.example.migestion.data.repositories.invoicerepository.InvoiceRepository
+import com.example.migestion.data.repositories.productrepository.ProductRepository
 import com.example.migestion.model.Customer
+import com.example.migestion.model.Product
 import com.example.migestion.model.Response
 import com.example.migestion.usecases.UseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -22,7 +25,8 @@ import javax.inject.Inject
 class CreateInvoiceViewModel @Inject constructor(
     private val useCases: UseCases,
     private val invoiceRepository: InvoiceRepository,
-    private val customerRepository: CustomerRepository
+    private val customerRepository: CustomerRepository,
+    private val productRepository: ProductRepository
 ) : ViewModel() {
 
     var idInvoice by mutableIntStateOf(0)
@@ -37,6 +41,9 @@ class CreateInvoiceViewModel @Inject constructor(
     var selectedCustomer by mutableStateOf<Customer?>(null)
         private set
 
+    var productsResponse by mutableStateOf<Response<List<Product>>>(Response.Loading)
+        private set
+
 
     init {
         viewModelScope.launch {
@@ -44,6 +51,7 @@ class CreateInvoiceViewModel @Inject constructor(
         }
         getNumInvoice()
         getCustomers()
+        getProducts()
 
     }
 
@@ -59,7 +67,6 @@ class CreateInvoiceViewModel @Inject constructor(
     }
 
     // Sacar del viewModel?
-
     private fun getFormattedCurrentDate(): String {
         val currentDateTime = LocalDate.now()
         val formatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale("es"))
@@ -73,7 +80,37 @@ class CreateInvoiceViewModel @Inject constructor(
         selectedCustomer = customer
     }
 
+    fun finishInvoice() = viewModelScope.launch {
+        selectedCustomer?.let {
+            invoiceRepository.createInvoice(
+                idInvoice,
+                listOf(),
+                it.id,
+                1,
+                getFormattedCurrentDate(),
+                true
+            )
+            productRepository.persistProductsFromInvoice(idInvoice)
+        }
+    }
 
+/*    private fun getProducts() = viewModelScope.launch {
+        productRepository.getProductsFromInvoice(idInvoice).collect {
+            when (it) {
+                is Response.Failure -> {}
+                Response.Loading -> {}
+                is Response.Success -> {
+                    productsResponse = it
+                }
+            }
+        }
+    }*/
+
+    private fun getProducts() = viewModelScope.launch {
+        productRepository.getProductsFromInvoice(idInvoice).collect {
+            productsResponse = it
+        }
+    }
 
 
 }

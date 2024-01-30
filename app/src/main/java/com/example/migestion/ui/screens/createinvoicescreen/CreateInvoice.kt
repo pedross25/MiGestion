@@ -1,5 +1,6 @@
 package com.example.migestion.ui.screens.createinvoicescreen
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,13 +13,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -39,7 +46,12 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.migestion.model.Customer
+import com.example.migestion.model.Product
+import com.example.migestion.model.Response
+import com.example.migestion.ui.components.ProductListView
 import com.example.migestion.ui.navigation.graphs.DetailsScreen
+import com.example.migestion.ui.screens.invoicescreen.InvoiceCard
+import com.example.migestion.ui.screens.invoicescreen.InvoiceViewModel
 import com.example.migestion.ui.theme.BlueInvoice
 import com.example.migestion.ui.theme.TextGray
 
@@ -189,7 +201,12 @@ fun CustomerInvoice(
 }
 
 @Composable
-fun AlbaranInvoice(navController: NavController) {
+fun AlbaranInvoice(
+    navController: NavController,
+    viewModel: CreateInvoiceViewModel = hiltViewModel()
+) {
+    var expanded by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .background(color = Color.White, shape = RoundedCornerShape(20.dp))
@@ -198,38 +215,73 @@ fun AlbaranInvoice(navController: NavController) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = "PRODUCTOS",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
-                color = BlueInvoice
+                color = BlueInvoice,
+                modifier = Modifier.weight(1f)
             )
-
+            Spacer(modifier = Modifier.weight(1f))
             Icon(
-                imageVector = Icons.Default.KeyboardArrowRight,
+                imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                 contentDescription = "Añadir albaran",
                 tint = Color.Gray,
-                modifier = Modifier
-                    .clickable {
-                        navController.navigate(DetailsScreen.SelectProducts.route)
-                    }
+                modifier = Modifier.clickable { expanded = !expanded }
             )
+            Spacer(modifier = Modifier.padding(8.dp))
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "Añadir albaran",
+                tint = Color.Gray,
+                modifier = Modifier.clickable {
+                    navController.navigate(
+                        DetailsScreen.SelectProducts.crearRoute(
+                            viewModel.idInvoice
+                        )
+                    )
+                }
+            )
+        }
+
+        // TODO Cambiar a listas inmutables
+        AnimatedVisibility(visible = expanded) {
+            var productList: List<Product> = listOf()
+            when(val products = viewModel.productsResponse) {
+                is Response.Failure -> {}
+                Response.Loading -> {}
+                is Response.Success -> {
+                    productList = products.data
+                }
+            }
+            LazyColumn {
+                items(productList) { product ->
+                    Column {
+                        ProductListView(product)
+                        //Divider(color = Color.Gray, thickness = 1.dp)
+                    }
+                }
+            }
         }
     }
 }
 
 @Composable
-fun Bottom() {
+fun Bottom(
+    viewModel: CreateInvoiceViewModel = hiltViewModel(),
+    viewModel2: InvoiceViewModel = hiltViewModel()
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
         horizontalArrangement = Arrangement.End
     ) {
-        Button(/*colors = , */onClick = { /*TODO*/ }) {
+        Button(/*colors = , */onClick = {
+            viewModel.finishInvoice()
+        }) {
             Text(text = "Crear", color = Color.White)
         }
     }

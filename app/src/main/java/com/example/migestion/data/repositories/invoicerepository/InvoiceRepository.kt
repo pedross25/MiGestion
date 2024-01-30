@@ -7,9 +7,12 @@ import kotlinx.coroutines.flow.Flow
 interface InvoiceRepository {
 
     suspend fun createInvoice(
+        id: Int,
         idAlbarans: List<Int>,
         customer: Int,
-        idPaymentMethod: Int
+        idPaymentMethod: Int,
+        date: String,
+        finished: Boolean = false
     ): Response<Invoice>
 
     suspend fun getAllInvoices(): Response<List<Invoice>>

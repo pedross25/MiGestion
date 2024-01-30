@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,12 +21,9 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -41,21 +37,36 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.migestion.data.db.SelectInvoiceWithCustomer
 import com.example.migestion.model.Response
 import com.example.migestion.ui.components.BarraBusqueda
 import com.example.migestion.ui.components.ProgressBar
 import com.example.migestion.ui.theme.BlueCobrado
 import com.example.migestion.ui.theme.BlueInvoice
 import com.example.migestion.ui.theme.NaranjaPendiente
-import com.example.migestion.usecases.InvoiceWithCustomer
 import kotlinx.coroutines.launch
 
 
 @Composable
 fun Invoices(
     viewModel: InvoiceViewModel = hiltViewModel(),
-    invoicesContent: @Composable (invoices: List<InvoiceWithCustomer>) -> Unit
+    invoicesContent: @Composable (invoices: List<SelectInvoiceWithCustomer>) -> Unit
 ) {
+    //val lifecycleOwner = LocalLifecycleOwner.current
+    //val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
+
+    /*LaunchedEffect(lifecycleState) {
+
+        when (lifecycleState) {
+            Lifecycle.State.DESTROYED -> {}
+            Lifecycle.State.INITIALIZED -> {}
+            Lifecycle.State.CREATED -> {}
+            Lifecycle.State.STARTED -> {}
+            Lifecycle.State.RESUMED -> {
+                viewModel.onResume()
+            }
+        }
+    }*/
 
     when (val invoiceResponse = viewModel.invoiceResponse) {
         is Response.Loading -> ProgressBar()
@@ -100,8 +111,8 @@ fun InvoiceScreen(viewModel: InvoiceViewModel = hiltViewModel()) {
                         contentPadding = PaddingValues(8.dp),
                         shape = RoundedCornerShape(24.dp),
                         modifier = Modifier
-                        .padding(4.dp)
-                        .height(35.dp)
+                            .padding(4.dp)
+                            .height(35.dp)
                     ) {
                         Text(text = title)
                     }
@@ -126,7 +137,7 @@ fun InvoiceScreen(viewModel: InvoiceViewModel = hiltViewModel()) {
 }
 
 @Composable
-fun InvoiceList(invoices: List<InvoiceWithCustomer>) {
+fun InvoiceList(invoices: List<SelectInvoiceWithCustomer>) {
     LazyColumn {
         items(invoices) { invoice ->
             Column {
@@ -138,7 +149,7 @@ fun InvoiceList(invoices: List<InvoiceWithCustomer>) {
 }
 
 @Composable
-fun InvoiceCard(invoice: InvoiceWithCustomer) {
+fun InvoiceCard(invoice: SelectInvoiceWithCustomer) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -156,12 +167,12 @@ fun InvoiceCard(invoice: InvoiceWithCustomer) {
                     .wrapContentWidth()
             ) {
                 Text(
-                    text = "FACTURA${invoice.invoice.id}",
+                    text = "FACTURA${invoice.invoice_id}",
                     color = BlueInvoice,
                     fontSize = 12.sp
                 )
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = invoice.customer.businessName, fontWeight = FontWeight.Medium)
+                Text(text = invoice.businessName, fontWeight = FontWeight.Medium)
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(text = "156,32 €", fontWeight = FontWeight.SemiBold)
             }

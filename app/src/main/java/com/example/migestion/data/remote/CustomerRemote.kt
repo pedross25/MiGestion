@@ -3,7 +3,7 @@ package com.example.migestion.data.remote
 import com.example.migestion.data.db.CustomerEntity
 import com.example.migestion.data.model.CustomerParam
 import com.example.migestion.data.remote.model.ApiCustomer
-import com.example.pruebacom.data.remote.model.ApiResponse
+import com.example.migestion.data.remote.model.ApiResponse
 import com.example.migestion.data.remote.model.CustomerResponse
 import com.example.migestion.data.remote.model.map
 import com.example.migestion.data.repositories.customerrepository.IRemoteCustomer
@@ -19,6 +19,7 @@ import io.ktor.client.request.url
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import javax.inject.Inject
+
 class CustomerRemote @Inject constructor(
     private val httpClient: HttpClient,
 ) : IRemoteCustomer {
@@ -67,10 +68,8 @@ class CustomerRemote @Inject constructor(
         }
     }
 
-    override suspend fun getAll(): List<Customer>
-
-         = httpClient.get<CustomerResponse>(HttpRoutes.Customer.GETALL).data
-
+    override suspend fun getAll(): List<Customer> =
+        httpClient.get<CustomerResponse>(HttpRoutes.Customer.GETALL).data
 
 
 }

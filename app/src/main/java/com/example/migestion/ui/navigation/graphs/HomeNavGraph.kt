@@ -3,8 +3,10 @@ package com.example.migestion.ui.navigation.graphs
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.example.migestion.ui.navigation.BottomNavItem
 import com.example.migestion.ui.screens.createcustomerscreen.CreateCustomerScreen
@@ -13,7 +15,6 @@ import com.example.migestion.ui.screens.customerscreen.CustomerScreen
 import com.example.migestion.ui.screens.dashboardscreen.DashboardScreen
 import com.example.migestion.ui.screens.invoicescreen.InvoiceScreen
 import com.example.migestion.ui.screens.selectproductsscreen.SelectProduct
-import com.example.migestion.ui.screens.selectproductsscreen.SelectProducts
 
 @Composable
 fun HomeNavGraph(navController: NavHostController) {
@@ -41,9 +42,9 @@ fun NavGraphBuilder.detailsNavGraph(navController: NavHostController) {
         startDestination = DetailsScreen.FormularioAltaCliente.route
     ) {
         composable(route = DetailsScreen.FormularioAltaCliente.route) {
-        /*ScreenContent(name = DetailsScreen.Information.route) {
-                navController.navigate(DetailsScreen.Overview.route)
-            }*/
+            /*ScreenContent(name = DetailsScreen.Information.route) {
+                    navController.navigate(DetailsScreen.Overview.route)
+                }*/
             //ClientForm()
             CreateCustomerScreen(navController)
         }
@@ -56,8 +57,16 @@ fun NavGraphBuilder.detailsNavGraph(navController: NavHostController) {
             }*/
             CreateInvoiceScreen(navController)
         }
-        composable(route = DetailsScreen.SelectProducts.route) {
-            SelectProduct()
+        composable(
+            route = DetailsScreen.SelectProducts.route,
+            arguments = listOf(navArgument("idInvoice") {
+                type = NavType.IntType
+            })
+        ) {
+            SelectProduct(
+                idInvoice = it.arguments?.getInt("idInvoice") ?: 0,
+                navController = navController
+            )
         }
     }
 }
@@ -66,5 +75,9 @@ sealed class DetailsScreen(val route: String) {
     object FormularioAltaCliente : DetailsScreen(route = "FORMULARIO")
     object Overview : DetailsScreen(route = "OVERVIEW")
 
-    object SelectProducts: DetailsScreen(route = "SELECCIONAR PRODUCTOS")
+    object SelectProducts : DetailsScreen(route = "SELECCIONAR PRODUCTOS/{idInvoice}") {
+        fun crearRoute(idInvoice: Int): String {
+            return "SELECCIONAR PRODUCTOS/$idInvoice"
+        }
+    }
 }

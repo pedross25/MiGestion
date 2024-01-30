@@ -12,5 +12,6 @@ object HttpRoutes {
     object Product {
         private const val BASE_PRODUCT = "$BASE_URL/product"
         const val GETALL = "${Product.BASE_PRODUCT}/getAll"
+        const val CREATE = "${Product.BASE_PRODUCT}/create"
     }
 }
