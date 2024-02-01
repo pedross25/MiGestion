@@ -11,7 +11,13 @@ object HttpRoutes {
 
     object Product {
         private const val BASE_PRODUCT = "$BASE_URL/product"
-        const val GETALL = "${Product.BASE_PRODUCT}/getAll"
-        const val CREATE = "${Product.BASE_PRODUCT}/create"
+        const val GETALL = "$BASE_PRODUCT/getAll"
+        const val CREATE = "$BASE_PRODUCT/create"
+    }
+
+    object Image {
+        private const val BASE_IMAGE = "$BASE_URL/file"
+        const val UPLOAD = "$BASE_IMAGE/upload"
+        const val GET = "$BASE_IMAGE/"
     }
 }

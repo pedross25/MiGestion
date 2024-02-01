@@ -12,6 +12,7 @@ import com.example.migestion.data.db.Database
 import com.example.migestion.data.network.MiGestionHttpClient
 import com.example.migestion.data.remote.AlbaranRemote
 import com.example.migestion.data.remote.CustomerRemote
+import com.example.migestion.data.remote.FileRemote
 import com.example.migestion.data.repositories.albaranrepository.AlbaranRepository
 import com.example.migestion.data.repositories.albaranrepository.AlbaranRepositoryImpl
 import com.example.migestion.data.repositories.albaranrepository.ICacheAlbaran
@@ -88,6 +89,12 @@ object AppModule {
     @Singleton
     fun provideCustomerRemote(httpClient: HttpClient): IRemoteCustomer {
         return CustomerRemote(httpClient)
+    }
+
+    @Provides
+    @Singleton
+    fun provideFileRemote(httpClient: HttpClient): FileRemote {
+        return FileRemote(httpClient)
     }
 
     @Provides

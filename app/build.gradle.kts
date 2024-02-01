@@ -81,6 +81,7 @@ dependencies {
     implementation ("io.ktor:ktor-client-serialization:1.5.0")
     implementation ("io.ktor:ktor-client-logging-jvm:1.5.0")
 
+    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2")
     //sqldelight
     implementation("app.cash.sqldelight:android-driver:2.0.0")
     implementation("app.cash.sqldelight:coroutines-extensions-jvm:2.0.0")
@@ -89,6 +90,9 @@ dependencies {
     //Hilt
     implementation ("com.google.dagger:hilt-android:2.50")
     kapt ("com.google.dagger:hilt-compiler:2.50")
+
+    // Coil
+    implementation("io.coil-kt:coil-compose:2.5.0")
 
     //implementation ("com.google.dagger:hilt-android:2.49")
 
