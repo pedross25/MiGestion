@@ -23,8 +23,8 @@ SELECT * FROM productEntity WHERE id = ?;
 
 -- Insertar un producto
 insert:
-INSERT INTO productEntity (name, amount, price, category, template, description, invoice_id)
-VALUES (?, ?, ?, ?, ?, ?, ?);
+INSERT INTO productEntity (id, name, amount, price, category, template, description, invoice_id)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
 
 -- Actualizar los datos de un producto por ID
 update:
@@ -43,3 +43,7 @@ selectTemplateProducts:
 SELECT *
 FROM productEntity
 WHERE template>0;
+
+-- Obtener el ultimo id en uso
+getMaxId:
+SELECT MAX(id) FROM productEntity;

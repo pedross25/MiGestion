@@ -2,47 +2,66 @@ package com.example.migestion.data.repositories.authrepository
 
 import com.example.migestion.data.model.Login
 import com.example.migestion.data.model.RegisterParam
+import com.example.migestion.data.remote.model.ApiResponse
 import com.example.migestion.model.Response
 import com.example.migestion.model.User
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 import io.ktor.client.request.url
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
+import io.ktor.util.InternalAPI
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
     private val httpClient: HttpClient
-): AuthRepository  {
+) : AuthRepository {
 
     override suspend fun loginUser(email: String, password: String): Flow<Response<User>> {
         return flow {
             try {
                 emit(Response.Loading)
-                    val user = httpClient.post<User> {
-                    url("http://10.0.2.2:8080/auth/login")
+                val response = httpClient.post("http://5.250.187.56:8080/auth/login") {
                     contentType(ContentType.Application.Json)
-                    body = Login(email, password = password)
+                    setBody(Login(email, password = password))
                 }
-                emit(Response.Success(user))
+                val user = response.body<ApiResponse<User>>()
+                emit(Response.Success(user.data))
             } catch (e: Exception) {
                 emit(Response.Failure(e))
             }
         }
     }
-    override suspend fun registerUser(email: String, password: String, nombre: String, avatar: String): Flow<Response<String>> {
+
+    @OptIn(InternalAPI::class)
+    override suspend fun registerUser(
+        email: String,
+        password: String,
+        nombre: String,
+        avatar: String
+    ): Flow<Response<String>> {
         return flow {
             try {
                 emit(Response.Loading)
-                val message = httpClient.post<HttpResponse> { // or your data class
-                    url("http://10.0.2.2:8080/auth/register")
-                    contentType(ContentType.Application.Json)
-                    body = RegisterParam(email = email, password = password, fullName = nombre, avatar = avatar)
-                }
+                val message =
+                    httpClient.post("http://5.250.187.56:8080/auth/register") { // or your data class
+                        contentType(ContentType.Application.Json)
+                        setBody(
+                            RegisterParam(
+                                email = email,
+                                password = password,
+                                fullName = nombre,
+                                avatar = avatar
+                            )
+                        )
+
+                    }
                 if (message.status == HttpStatusCode.OK) {
                     emit(Response.Success("ok"))
                 } else {
@@ -53,9 +72,5 @@ class AuthRepositoryImpl @Inject constructor(
             }
         }
     }
-/*
-    override suspend fun googleSignIn(credential: AuthCredential): Flow<Response<AuthResult>> {
-        TODO("Not yet implemented")
-    }*/
 
 }

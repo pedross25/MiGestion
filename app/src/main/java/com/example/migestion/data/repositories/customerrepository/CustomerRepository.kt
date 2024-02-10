@@ -16,7 +16,7 @@ interface CustomerRepository {
         email: String,
         phoneNumber: String,
         cif: String
-    ): Flow<Response<CustomerEntity>>
+    ): Flow<Response<Customer>>
 
     suspend fun getAll(): Response<List<Customer>>
 

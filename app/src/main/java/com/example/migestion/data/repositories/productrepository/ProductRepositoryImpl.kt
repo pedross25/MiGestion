@@ -8,22 +8,18 @@ import com.example.migestion.model.Response
 import com.example.migestion.model.toProduct
 import com.example.migestion.model.toProductEntity
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.post
-import io.ktor.client.request.url
+import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
-import kotlinx.serialization.Serializable
 import javax.inject.Inject
 
-@Serializable
-data class ProductResponse(
-    val data: List<Product>
-)
 
 class ProductRepositoryImpl @Inject constructor(
     private val productDb: ICacheProduct,
@@ -35,14 +31,13 @@ class ProductRepositoryImpl @Inject constructor(
             if (products.isNotEmpty()) {
                 Response.Success(products.map { it.toProduct() })
             } else {
-                val message = httpClient.get<ProductResponse> {
-                    url(HttpRoutes.Product.GETALL)
+                val message = httpClient.get(HttpRoutes.Product.GETALL) {
                     contentType(ContentType.Application.Json)
                 }
-                message.data.forEach {
+                message.body<List<Product>>().forEach {
                     productDb.insertProduct(productEntity = it.toProductEntity())
                 }
-                Response.Success(data = message.data)
+                Response.Success(data = message.body())
             }
         } catch (e: Exception) {
             Response.Failure(e)
@@ -53,24 +48,62 @@ class ProductRepositoryImpl @Inject constructor(
         product: Product,
         persistApi: Boolean
     ): Response<Product> {
+        return addProduct(
+            product.name,
+            product.description,
+            product.price,
+            product.amount,
+            product.category,
+            product.template,
+            product.invoice,
+            persistApi
+        )
+    }
+
+    override suspend fun addProduct(
+        name: String,
+        description: String?,
+        price: Double,
+        quantity: Int,
+        category: String,
+        template: Boolean,
+        invoice: Int?,
+        persistApi: Boolean
+    ): Response<Product> {
         return try {
             if (persistApi) {
-                val message = httpClient.post<ApiResponse<Product>> {
-                    url(HttpRoutes.Product.CREATE)
+                val message = httpClient.post(HttpRoutes.Product.CREATE) {
                     contentType(ContentType.Application.Json)
-                    body = CreateProductParams(
-                        name = product.name,
-                        price = product.price,
-                        category = product.category,
-                        amount = product.amount,
-                        description = product.description,
-                        template = product.template,
-                        invoice = product.invoice
+                    setBody(
+                        CreateProductParams(
+                            name = name,
+                            price = price,
+                            category = category,
+                            amount = quantity,
+                            description = description,
+                            template = template,
+                        )
                     )
                 }
-                Response.Success(message.data)
+                val product = message.body<ApiResponse<Product>>().data
+                productDb.insertProduct(
+                    product.toProductEntity()
+                )
+                Response.Success(product)
             } else {
-                productDb.insertProduct(product.toProductEntity())
+                val product = Product(
+                    productDb.getNextId(),
+                    name = name,
+                    amount = quantity,
+                    price = price,
+                    category = category,
+                    template = template,
+                    description = description,
+                    invoice = invoice,
+                )
+                productDb.insertProduct(
+                    product.toProductEntity()
+                )
                 Response.Success(product)
             }
         } catch (e: Exception) {
@@ -100,11 +133,10 @@ class ProductRepositoryImpl @Inject constructor(
         return try {
             var products = productDb.getTemplateProducts().map { it.toProduct() }
             if (products.isEmpty()) {
-                val message = httpClient.get<ProductResponse> {
-                    url(HttpRoutes.Product.GETALL)
+                val message = httpClient.get(HttpRoutes.Product.GETALL) {
                     contentType(ContentType.Application.Json)
                 }
-                message.data.forEach {
+                message.body<ApiResponse<List<Product>>>().data.forEach {
                     productDb.insertProduct(productEntity = it.toProductEntity())
                 }
                 products = productDb.getTemplateProducts().map { it.toProduct() }
@@ -114,22 +146,6 @@ class ProductRepositoryImpl @Inject constructor(
             Response.Failure(e)
         }
     }
-
-   /* override suspend fun getProductsFromInvoice(idInvoice: Int): Flow<Response<Product>> {
-        return flow {
-            try {
-                emit(Response.Loading)
-
-                productDb.getFlowProductsByInvoice(idInvoice)
-
-                emit(Response.Success(data = productDb.getFlowProductsByInvoice(idInvoice)))
-
-            } catch (e: Exception) {
-                Log.i("GESTION", e.toString())
-                emit(Response.Failure(e))
-            }
-        }
-    }*/
 
     override suspend fun getProductsFromInvoice(idInvoice: Int): Flow<Response<List<Product>>> {
         return productDb.getFlowProductsByInvoice(idInvoice)

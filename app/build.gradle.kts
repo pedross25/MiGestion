@@ -55,6 +55,8 @@ android {
 }
 
 dependencies {
+    val ktorVersion = "2.3.7"
+    val lifecycleVersion = "2.7.0"
 
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
@@ -77,11 +79,27 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.6")
 
     //ktor client, serialization and logging
-    implementation ("io.ktor:ktor-client-android:1.5.0")
-    implementation ("io.ktor:ktor-client-serialization:1.5.0")
-    implementation ("io.ktor:ktor-client-logging-jvm:1.5.0")
+    /*implementation ("io.ktor:ktor-client-android:1.5.0")
+    implementation ("io.ktor:ktor-client-serialization:1.5.0")*/
+    /*implementation ("io.ktor:ktor-client-logging-jvm:$ktorVersion")
 
-    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2")
+    implementation("io.ktor:ktor-client-core:$ktorVersion")
+    implementation("io.ktor:ktor-client-android:$ktorVersion")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")*/
+    /*implementation ("io.ktor:ktor-client-core:$ktor_version")
+    implementation ("io.ktor:ktor-client-okhttp:$ktor_version")
+    implementation ("io.ktor:ktor-client-content-negotiation:$ktor_version")
+    implementation ("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")*/
+    implementation("io.ktor:ktor-client-core:$ktorVersion")
+    implementation("io.ktor:ktor-client-android:$ktorVersion")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+
+    /*implementation("io.ktor:ktor-client-core:2.0.0")
+    implementation("io.ktor:ktor-client-cio:2.0.0")*/
+
+    /*implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2")*/
     //sqldelight
     implementation("app.cash.sqldelight:android-driver:2.0.0")
     implementation("app.cash.sqldelight:coroutines-extensions-jvm:2.0.0")
@@ -94,10 +112,7 @@ dependencies {
     // Coil
     implementation("io.coil-kt:coil-compose:2.5.0")
 
-    //implementation ("com.google.dagger:hilt-android:2.49")
 
-    //kapt ("com.google.dagger:hilt-android-compiler:2.48")
-    //implementation ("androidx.hilt:hilt-navigation-compose:1.1.0")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
 }

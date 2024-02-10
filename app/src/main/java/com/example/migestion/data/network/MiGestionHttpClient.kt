@@ -3,17 +3,17 @@ package com.example.migestion.data.network
 import android.util.Log
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
-import io.ktor.client.features.DefaultRequest
-import io.ktor.client.features.json.JsonFeature
-import io.ktor.client.features.json.serializer.KotlinxSerializer
-import io.ktor.client.features.logging.Logger
-import io.ktor.client.features.logging.Logging
-import io.ktor.client.features.observer.ResponseObserver
+import io.ktor.client.plugins.DefaultRequest
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.observer.ResponseObserver
+
 import io.ktor.client.request.header
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
+import io.ktor.serialization.kotlinx.json.json
 import javax.inject.Inject
 
+/*
 class MiGestionHttpClient @Inject constructor() {
 
     fun getHttpClient() = HttpClient(Android) {
@@ -55,4 +55,14 @@ class MiGestionHttpClient @Inject constructor() {
         private const val TAG_KTOR_LOGGER = "ktor_logger:"
         private const val TAG_HTTP_STATUS_LOGGER = "http_status:"
     }
+}*/
+
+class MiGestionHttpClient @Inject constructor() {
+    fun getHttpClient() = HttpClient(Android) {
+        install(ContentNegotiation) {
+            json()
+        }
+
+    }
+
 }

@@ -11,6 +11,7 @@ import io.ktor.client.request.forms.formData
 import io.ktor.client.request.forms.submitFormWithBinaryData
 import io.ktor.client.request.get
 import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 import io.ktor.client.request.url
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
@@ -28,73 +29,18 @@ class FileRemote @Inject constructor(
     private val httpClient: HttpClient,
 ) {
 
-
-    suspend fun getBitmap(uri: Uri): Bitmap? {
-        return runCatching {
-            val byteArray = withContext(Dispatchers.IO) {
-                httpClient.get<ByteArray>(Url(uri.toString()))
-            }
-
-            return withContext(Dispatchers.Default) {
-                ByteArrayInputStream(byteArray).use {
-                    val option = BitmapFactory.Options()
-                    option.inPreferredConfig =
-                        Bitmap.Config.RGB_565 // To save memory, or use RGB_8888 if alpha channel is expected
-                    BitmapFactory.decodeStream(it, null, option)
-                }
-            }
-        }.getOrElse {
-            Log.e("getBitmap", "Failed to get bitmap ${it.message ?: ""}")
-            null
-        }
-    }
-
-    suspend fun uploadImage1(image: File) {
-        try {
-            val message = httpClient.post<HttpClient> {
-                url(HttpRoutes.Image.UPLOAD)
-                body = MultiPartFormDataContent(formData {
-                    append("image", image.readBytes(), Headers.build {
-                        append(HttpHeaders.ContentType, ContentType.Image.Any.toString())
-                        append(HttpHeaders.ContentDisposition, "filename=${image.name}")
-                    })
-                })
-            }
-            //message.data.map()
-        } catch (e: Exception) {
-            println("Error: $e")
-        }
-    }
-
-    suspend fun uploadImage(image: File) {
-        try {
-            val response: HttpResponse = httpClient.submitFormWithBinaryData(
-                url = "http://localhost:8080/upload",
-                formData = formData {
-                    append("description", "Ktor logo")
-                    append("image", image.readBytes(), Headers.build {
-                        append(HttpHeaders.ContentType, "image/png")
-                        append(HttpHeaders.ContentDisposition, "filename=\"ktor_logo.png\"")
-                    })
-                }
-            )
-        } catch (e: Exception) {
-            println("Error: $e")
-        }
-    }
-
     suspend fun uploadImage2(image: File) {
         try {
-            val response: HttpResponse = httpClient.post("http://localhost:8080/upload") {
-                body = (MultiPartFormDataContent(
+            val response: HttpResponse = httpClient.post(HttpRoutes.Image.UPLOAD) {
+                setBody(MultiPartFormDataContent(
                     formData {
                         append("description", "Ktor logo")
                         append("image", image.readBytes(), Headers.build {
                             append(HttpHeaders.ContentType, "image/png")
-                            append(HttpHeaders.ContentDisposition, "filename=\"ktor_logo.png\"")
+                            append(HttpHeaders.ContentDisposition, "filename=\"${image.name}\"")
                         })
                     },
-                    /*boundary = "WebAppBoundary"*/
+                    boundary = "WebAppBoundary"
                 )
                 )
 

@@ -2,20 +2,20 @@ package com.example.migestion.data.remote
 
 import com.example.migestion.data.db.CustomerEntity
 import com.example.migestion.data.model.CustomerParam
+import com.example.migestion.data.network.HttpRoutes
 import com.example.migestion.data.remote.model.ApiCustomer
 import com.example.migestion.data.remote.model.ApiResponse
-import com.example.migestion.data.remote.model.CustomerResponse
 import com.example.migestion.data.remote.model.map
 import com.example.migestion.data.repositories.customerrepository.IRemoteCustomer
-import com.example.migestion.data.network.HttpRoutes
 import com.example.migestion.model.Customer
 import io.ktor.client.HttpClient
-import io.ktor.client.features.ClientRequestException
-import io.ktor.client.features.RedirectResponseException
-import io.ktor.client.features.ServerResponseException
+import io.ktor.client.call.body
+import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.plugins.RedirectResponseException
+import io.ktor.client.plugins.ServerResponseException
 import io.ktor.client.request.get
 import io.ktor.client.request.post
-import io.ktor.client.request.url
+import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import javax.inject.Inject
@@ -35,7 +35,21 @@ class CustomerRemote @Inject constructor(
     ): CustomerEntity? {
 
         return try {
-            val message = httpClient.post<ApiResponse<ApiCustomer>> {
+            val message = httpClient.post(HttpRoutes.Customer.CREATE) {
+                contentType(ContentType.Application.Json)
+                setBody(CustomerParam(
+                    businessName = name,
+                    streetAddress = streetAddress,
+                    city = city,
+                    state = state,
+                    postalCode = postalCode,
+                    email = email,
+                    phoneNumber = phoneNumber,
+                    cif = cif
+                ))
+            }
+            message.body<ApiResponse<ApiCustomer>>().data.map()
+            /*val message = httpClient.post<ApiResponse<ApiCustomer>> {
                 url(HttpRoutes.Customer.CREATE)
                 contentType(ContentType.Application.Json)
                 body = CustomerParam(
@@ -49,7 +63,7 @@ class CustomerRemote @Inject constructor(
                     cif = cif
                 )
             }
-            message.data.map()
+            message.data.map()*/
         } catch (e: RedirectResponseException) {
             // 3xx - responses
             println("Error: ${e.response.status.description}")
@@ -68,8 +82,15 @@ class CustomerRemote @Inject constructor(
         }
     }
 
-    override suspend fun getAll(): List<Customer> =
-        httpClient.get<CustomerResponse>(HttpRoutes.Customer.GETALL).data
+    override suspend fun getAll(): List<Customer> {
+        try {
+            val message = httpClient.get(HttpRoutes.Customer.GETALL)
+            return message.body<ApiResponse<List<Customer>>>().data
+        } catch (e: Exception) {
+            return emptyList()
+        }
+
+    }
 
 
 }

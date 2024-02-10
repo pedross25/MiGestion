@@ -1,6 +1,5 @@
 package com.example.migestion.ui.screens.customerscreen
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,9 +20,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
@@ -55,17 +51,11 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
-import com.example.migestion.data.db.CustomerEntity
+import com.example.migestion.model.Customer
 import com.example.migestion.model.Response
 import com.example.migestion.ui.components.BarraBusqueda
 import com.example.migestion.ui.components.ProgressBar
-import com.example.migestion.ui.theme.TextGray
-
-//data class CustomerEntity(val name: String, val correo: String)
-data class MenuItem(val text: String, @DrawableRes val icon: Int)
 
 @Composable
 fun CustomerScreen(viewModel: CustomerViewModel = hiltViewModel(), onItemClick: (String) -> Unit) {
@@ -88,7 +78,7 @@ fun CustomerScreen(viewModel: CustomerViewModel = hiltViewModel(), onItemClick: 
 @Composable
 fun Customers(
     viewModel: CustomerViewModel = hiltViewModel(),
-    productsContent: @Composable (products: List<CustomerEntity>) -> Unit
+    productsContent: @Composable (products: List<Customer>) -> Unit
 ) {
     when (val productsResponse = viewModel.customerResponse) {
         is Response.Loading -> ProgressBar()
@@ -97,51 +87,11 @@ fun Customers(
     }
 }
 
-/*
-@Composable
-fun CustomerScreen() {
-/*
-    val customerList = listOf(
-        CustomerEntity("John Doe", "john.doe@example.com"),
-        CustomerEntity("Jane Smith", "jane.smith@example.com"),
-        CustomerEntity("Alice Johnson", "alice.johnson@example.com"),
-        CustomerEntity("Bob Williams", "bob.williams@example.com"),
-        CustomerEntity("Eva Davis", "eva.davis@example.com"),
-        CustomerEntity("David Brown", "david.brown@example.com"),
-        CustomerEntity("Emma Taylor", "emma.taylor@example.com"),
-        CustomerEntity("Michael Miller", "michael.miller@example.com"),
-        CustomerEntity("Olivia Davis", "olivia.davis@example.com"),
-        CustomerEntity("William Jones", "william.jones@example.com"),
-        CustomerEntity("Sophia Wilson", "sophia.wilson@example.com"),
-        CustomerEntity("Noah Davis", "noah.davis@example.com"),
-        CustomerEntity("Ava Robinson", "ava.robinson@example.com"),
-        CustomerEntity("Liam White", "liam.white@example.com"),
-        CustomerEntity("Isabella Thompson", "isabella.thompson@example.com"),
-        CustomerEntity("Mason Harris", "mason.harris@example.com"),
-        CustomerEntity("Olivia Davis", "olivia.davis@example.com"),
-        CustomerEntity("Emma Robinson", "emma.robinson@example.com"),
-        CustomerEntity("Lucas Hall", "lucas.hall@example.com"),
-        CustomerEntity("Ava Davis", "ava.davis@example.com")
-    )
-    */
-
-    var showClientForm by remember { mutableStateOf(false) }
-
-    if (showClientForm) {
-        ClientForm()
-    }
-
-    Column {
-        BarraBusqueda()
-        CustomerList(customerList) {}
-    }
-}
- */
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CustomerList(
-    customers: List<CustomerEntity>,
+    customers: List<Customer>,
     onItemClick: (String) -> Unit,
     viewModel: CustomerViewModel
 ) {
@@ -155,15 +105,13 @@ fun CustomerList(
     var selectedIndex by remember { mutableIntStateOf(-1) }
 
     // Estado para manejar el cliente seleccionado
-    var selectedCustomer by remember { mutableStateOf<CustomerEntity?>(null) }
+    var selectedCustomer by remember { mutableStateOf<Customer?>(null) }
 
     // Estado para controlar la visibilidad del menú emergente
     var isMenuVisible by remember { mutableStateOf(false) }
 
     // Estado para manejar la posición del menú emergente
     var menuPosition by remember { mutableStateOf(IntOffset(0, 0)) }
-
-
 
     var isAddClientPopupVisible by remember { mutableStateOf(false) }
 
@@ -179,16 +127,15 @@ fun CustomerList(
         ) {
 
             //val groupedClientes = customers.groupBy { it.businessName.first().uppercaseChar() }
-            val groupedClientes: Map<String, List<CustomerEntity>> = customers.groupBy {
+            val groupedClientes: Map<String, List<Customer>> = customers.groupBy {
                 (it.businessName.firstOrNull()?.uppercaseChar() ?: "Sin nombre").toString()
             }
 
             LazyColumn {
                 groupedClientes.forEach { (letra, clientesConLetra) ->
                     stickyHeader {
-                        // Sticky header que muestra la letra
                         Text(
-                            text = letra.toString(),
+                            text = letra,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(MaterialTheme.colorScheme.background)
@@ -201,13 +148,7 @@ fun CustomerList(
                         CustomerItem(
                             customer = customer
                         ) {
-                            // Actualizar el cliente seleccionado
                             selectedCustomer = customer
-
-                            // Calcular la posición del menú emergente
-
-
-                            // Mostrar el menú emergente
                             isMenuVisible = true
                         }
                     }
@@ -221,38 +162,6 @@ fun CustomerList(
                 val menuWidth =
                     with(LocalDensity.current) { (LocalDensity.current.density * 200).dp }
 
-       /*         DropdownMenu(
-                    expanded = isMenuVisible,
-                    onDismissRequest = { isMenuVisible = false },
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Gray.copy(alpha = 0.5f))
-                        .heightIn(max = menuHeight)
-                        .widthIn(max = menuWidth)
-                ) {
-                    items.forEach { menuItem ->
-                        DropdownMenuItem(onClick = {
-                            isMenuVisible = false
-                            // Handle the selected item here
-                            selectedIndex = items.indexOf(menuItem)
-                        }) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(8.dp),
-                                horizontalArrangement = Arrangement.Center
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = menuItem.icon),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(menuItem.text)
-                            }
-                        }
-                    }
-                }*/
             }
             DropdownMenu(
                 expanded = isAddClientPopupVisible,
@@ -274,7 +183,7 @@ fun CustomerList(
 }
 
 @Composable
-fun CustomerItem(customer: CustomerEntity, onItemClick: () -> Unit) {
+fun CustomerItem(customer: Customer, onItemClick: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -287,11 +196,6 @@ fun CustomerItem(customer: CustomerEntity, onItemClick: () -> Unit) {
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 4.dp)
         )
-
-        /*Text(
-            text = "Email: ${customer.correo}",
-            style = MaterialTheme.typography.bodyMedium
-        )*/
     }
 }
 

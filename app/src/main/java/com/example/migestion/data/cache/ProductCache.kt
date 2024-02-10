@@ -30,7 +30,8 @@ class ProductCache @Inject constructor(
                 category = productEntity.category,
                 template = productEntity.template,
                 description = productEntity.description,
-                invoice_id = productEntity.invoice_id
+                invoice_id = productEntity.invoice_id,
+                id = productEntity.id
             )
         }
     }
@@ -54,5 +55,9 @@ class ProductCache @Inject constructor(
 
     override suspend fun getFlowProductsByInvoice(idInvoice: Int): Flow<List<ProductEntity>> {
         return queries.selectByIdInvoice(idInvoice.toLong()).asFlow().mapToList(Dispatchers.IO)
+    }
+
+    override suspend fun getNextId(): Int {
+        return (queries.getMaxId().executeAsOne().MAX?.toInt()?.plus(1)) ?: 0
     }
 }

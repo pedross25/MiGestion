@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.migestion.data.db.CustomerEntity
 import com.example.migestion.data.repositories.customerrepository.CustomerRepository
+import com.example.migestion.model.Customer
 import com.example.migestion.model.Response
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -20,47 +21,37 @@ class CustomerViewModel @Inject constructor(
     private val repository: CustomerRepository
 ) : ViewModel() {
 
-    var customerResponse by mutableStateOf<Response<List<CustomerEntity>>>(Response.Loading)
+    var customerResponse by mutableStateOf<Response<List<Customer>>>(Response.Loading)
         private set
 
-    private val allCustomers = mutableListOf<CustomerEntity>()
+    private val allCustomers = mutableListOf<Customer>()
 
     private val _filteredCustomers = mutableStateOf(allCustomers)
     val filteredCustomers get() = _filteredCustomers.value
     val context = context
 
     init {
-        //getCustomers()
+        getCustomers()
     }
 
-    /*
+
     private fun getCustomers() = viewModelScope.launch {
-        repository.getAll().collect { response ->
-            when (response) {
-                is Response.Success -> {
-                    val customers = response.data
-                    customerResponse = Response.Success(data = customers)
-                    val orderedList = customers.sortedBy { it.businessName }
-                    allCustomers.addAll(orderedList)
-                    _filteredCustomers.value = orderedList.toMutableList()
-
-                    //.customerResponse = customerResponse
-                }
-
-                is Response.Failure -> {
-                    // Manejar el caso de error, por ejemplo, mostrar un mensaje de error
-                    //val errorMessage = response.exception.message
-                    // Haz algo con el mensaje de error si es necesario
-                }
-
-                is Response.Loading -> {
-                    // Puedes manejar el estado de carga si es necesario
-                }
+        val customersResponse = repository.getAll()
+        when(customersResponse) {
+            is Response.Success -> {
+                val customers = customersResponse.data
+                customerResponse = customersResponse
+                val orderedList = customers.sortedBy { it.businessName }
+                allCustomers.addAll(orderedList)
+                _filteredCustomers.value = orderedList.toMutableList()
             }
-        }
-    }*/
 
-    private fun insertAndSortNewCustomer(customer: CustomerEntity) {
+            is Response.Failure -> TODO()
+            Response.Loading -> TODO()
+        }
+    }
+
+    private fun insertAndSortNewCustomer(customer: Customer) {
         allCustomers.add(customer)
         val orderedList = allCustomers.sortedBy { it.businessName }
         _filteredCustomers.value = orderedList.toMutableList()
@@ -111,7 +102,7 @@ class CustomerViewModel @Inject constructor(
     }
 
 
-    private fun filterCustomers(searchText: String): List<CustomerEntity> {
+    private fun filterCustomers(searchText: String): List<Customer> {
         return if (searchText.isEmpty()) {
             allCustomers
         } else {

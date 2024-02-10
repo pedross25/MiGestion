@@ -90,14 +90,13 @@ class CreateInvoiceViewModel @Inject constructor(
     /**
      * Evento de seleccionar un cliente
      */
-    @SuppressLint("DiscouragedApi")
     fun selectCustomer(customer: Customer) = viewModelScope.launch {
-        //selectedCustomer = customer
-        // Suponiendo que `context` sea un contexto de tu aplicación
+        selectedCustomer = customer
+        /*// Suponiendo que `context` sea un contexto de tu aplicación
         val resourceId = context.resources.getIdentifier("patinete", "drawable", context.packageName)
         val drawable = ContextCompat.getDrawable(context, resourceId)
 
-// Convierte el drawable en un archivo temporal
+        // Convierte el drawable en un archivo temporal
         val bitmap = (drawable as BitmapDrawable).bitmap
         val tempFile = File.createTempFile("image", ".png", context.cacheDir)
         tempFile.deleteOnExit()
@@ -108,7 +107,7 @@ class CreateInvoiceViewModel @Inject constructor(
         fileOutputStream.close()
 
         //val file = File(context.filesDir, "patinete.jpg")
-        fileRepository.uploadImage2(tempFile)
+        fileRepository.uploadImage2(tempFile)*/
 
     }
 

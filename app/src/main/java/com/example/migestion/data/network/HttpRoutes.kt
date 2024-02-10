@@ -1,7 +1,7 @@
 package com.example.migestion.data.network
 
 object HttpRoutes {
-    private const val BASE_URL = "http://10.0.2.2:8080"
+    private const val BASE_URL = "http://5.250.187.56:8080"
 
     object Customer {
         private const val BASE_CUSTOMER = "$BASE_URL/customer"

@@ -10,10 +10,11 @@ data class Product(
     val amount: Int,
     val price: Double,
     val category: String,
-    val createdAt: String?,
-    val template: Boolean,
+    val createdAt: String? = null,
+    val template: Boolean = false,
     val description: String?,
-    val invoice: Int?
+    val invoice: Int? = null,
+    var images: List<String>? = null
 )
 
 

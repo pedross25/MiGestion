@@ -24,7 +24,7 @@ class CustomerRepositoryImpl @Inject constructor(
         email: String,
         phoneNumber: String,
         cif: String
-    ): Flow<Response<CustomerEntity>> {
+    ): Flow<Response<Customer>> {
         return flow {
             try {
                 emit(Response.Loading)
@@ -44,7 +44,7 @@ class CustomerRepositoryImpl @Inject constructor(
                     withContext(Dispatchers.IO) {
                         customerDb.insertCustomer(customer)
                     }
-                    emit(Response.Success(customer))
+                    emit(Response.Success(customer.toCustomer()))
                 }
             } catch (e: Exception) {
                 Log.i("GESTION", e.toString())
@@ -69,7 +69,7 @@ class CustomerRepositoryImpl @Inject constructor(
                                     it.streetAddress,
                                     it.city,
                                     it.state,
-                                    it.postalCode,
+                                    it.postalcode,
                                     it.email,
                                     it.phoneNumber,
                                     it.cif,

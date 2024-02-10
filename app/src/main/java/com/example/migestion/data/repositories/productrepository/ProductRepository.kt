@@ -15,7 +15,19 @@ interface ProductRepository {
     suspend fun getAllProducts(): Response<List<Product>>
 
     suspend fun addProduct(
-        product: Product, persistApi: Boolean = false
+        name: String,
+        description: String?,
+        price: Double,
+        quantity: Int,
+        category: String,
+        template: Boolean,
+        invoice: Int?,
+        persistApi: Boolean = false
+    ): Response<Product>
+
+    suspend fun addProduct(
+        product: Product,
+        persistApi: Boolean = false
     ): Response<Product>
 
     //suspend fun deleteProductFromFirestore(productId: String): DeleteProductResponse

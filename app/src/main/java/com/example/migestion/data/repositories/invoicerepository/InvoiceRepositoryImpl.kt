@@ -5,6 +5,7 @@ import com.example.migestion.data.cache.InvoiceCache
 import com.example.migestion.data.db.CustomerEntity
 import com.example.migestion.data.db.InvoiceEntity
 import com.example.migestion.data.model.InvoiceParam
+import com.example.migestion.data.remote.model.ApiResponse
 import com.example.migestion.data.repositories.customerrepository.CustomerRepository
 import com.example.migestion.data.repositories.customerrepository.ICacheCustomer
 import com.example.migestion.data.repositories.customerrepository.IRemoteCustomer
@@ -14,8 +15,10 @@ import com.example.migestion.model.Response
 import com.example.migestion.model.toInvoice
 import com.example.migestion.model.toInvoiceEntity
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 import io.ktor.client.request.url
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
@@ -55,14 +58,15 @@ class InvoiceRepositoryImpl @Inject constructor(
             )
             //Response.Success(invoice.toInvoice())
             if (finished) {
-                val message = httpClient.post<Invoice> {
-                    url("http://10.0.2.2:8080/invoice/create")
+                val message = httpClient.post("http://10.0.2.2:8080/invoice/create") {
                     contentType(ContentType.Application.Json)
-                    body = InvoiceParam(
-                        id = id,
-                        idCustomer = customer,
-                        idAlbarans = idAlbarans,
-                        idPaymentMethod = idPaymentMethod
+                    setBody(
+                        InvoiceParam(
+                            id = id,
+                            idCustomer = customer,
+                            idAlbarans = idAlbarans,
+                            idPaymentMethod = idPaymentMethod
+                        )
                     )
                 }
             }
@@ -75,28 +79,37 @@ class InvoiceRepositoryImpl @Inject constructor(
 
     override suspend fun getAllInvoices(): Response<List<Invoice>> {
         return try {
-            val invoices = invoiceDb.getAllInvoice()
+             val invoices = invoiceDb.getAllInvoice()
             if (invoices.isNotEmpty()) {
                 Response.Success(invoices.map { it.toInvoice() })
             } else {
-                val message = httpClient.get<InvoiceResponse> {
-                    url("http://10.0.2.2:8080/invoice/getAll")
+                val message = httpClient.get("http://10.0.2.2:8080/invoice/getAll") {
                     contentType(ContentType.Application.Json)
                 }
                 withContext(Dispatchers.IO) {
-                    message.data.forEach {
+                    message.body<ApiResponse<List<Invoice>>>().data.forEach {
                         invoiceDb.insertInvoice(
                             it.toInvoiceEntity()
                         )
                     }
                 }
-                Response.Success(data = message.data)
+                Response.Success(data = message.body<ApiResponse<List<Invoice>>>().data)
             }
         } catch (e: Exception) {
             Response.Failure(e)
         }
     }
 
-    override suspend fun getNextId(): Int = invoiceDb.getNextNum() + 1
+    override suspend fun getNextId(): Int  {
+        return try {
+            invoiceDb.getNextNum() + 1
+        } catch (e: Exception) {
+            val next = getAllInvoices()
+            if (next is Response.Success)
+                return getNextId()
+            else
+                return 0
+        }
+    }
 
 }

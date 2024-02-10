@@ -20,4 +20,6 @@ interface ICacheProduct {
 
     suspend fun getFlowProductsByInvoice(idInvoice: Int): Flow<List<ProductEntity>>
 
+    suspend fun getNextId(): Int
+
 }

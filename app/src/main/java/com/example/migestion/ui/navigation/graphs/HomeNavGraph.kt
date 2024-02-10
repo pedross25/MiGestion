@@ -11,6 +11,7 @@ import androidx.navigation.navigation
 import com.example.migestion.ui.navigation.BottomNavItem
 import com.example.migestion.ui.screens.createcustomerscreen.CreateCustomerScreen
 import com.example.migestion.ui.screens.createinvoicescreen.CreateInvoiceScreen
+import com.example.migestion.ui.screens.createproductscreen.CreateProduct
 import com.example.migestion.ui.screens.customerscreen.CustomerScreen
 import com.example.migestion.ui.screens.dashboardscreen.DashboardScreen
 import com.example.migestion.ui.screens.invoicescreen.InvoiceScreen
@@ -21,9 +22,9 @@ fun HomeNavGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
         route = Graph.HOME,
-        startDestination = BottomNavItem.Home.screen_route
+        startDestination = BottomNavItem.Dashboard.screen_route
     ) {
-        composable(route = BottomNavItem.Home.screen_route) {
+        composable(route = BottomNavItem.Dashboard.screen_route) {
             DashboardScreen()
         }
         composable(route = BottomNavItem.Customers.screen_route) {
@@ -68,12 +69,16 @@ fun NavGraphBuilder.detailsNavGraph(navController: NavHostController) {
                 navController = navController
             )
         }
+        composable(route = DetailsScreen.CreateProduct.route) {
+            CreateProduct(navController = navController)
+        }
     }
 }
 
 sealed class DetailsScreen(val route: String) {
     object FormularioAltaCliente : DetailsScreen(route = "FORMULARIO")
     object Overview : DetailsScreen(route = "OVERVIEW")
+    object CreateProduct : DetailsScreen(route = "create_product")
 
     object SelectProducts : DetailsScreen(route = "SELECCIONAR PRODUCTOS/{idInvoice}") {
         fun crearRoute(idInvoice: Int): String {

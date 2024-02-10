@@ -13,20 +13,22 @@ import javax.inject.Inject
 @HiltViewModel
 class SignInViewModel @Inject constructor(
     private val repository: AuthRepository
-): ViewModel() {
+) : ViewModel() {
 
     val _signInState = Channel<SignInState>()
     val signInState = _signInState.receiveAsFlow()
 
     fun loginUser(email: String, password: String) = viewModelScope.launch {
-        repository.loginUser(email, password).collect{result ->
-            when(result) {
+        repository.loginUser(email, password).collect { result ->
+            when (result) {
                 is Response.Success -> {
                     _signInState.send(SignInState(isSuccess = "Sign In Success"))
                 }
+
                 is Response.Loading -> {
                     _signInState.send(SignInState(isLoading = true))
                 }
+
                 is Response.Failure -> {
                     _signInState.send(SignInState(isError = result.e.toString()))
                 }

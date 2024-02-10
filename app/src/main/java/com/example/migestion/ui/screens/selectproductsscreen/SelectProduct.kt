@@ -47,6 +47,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.migestion.R
+import com.example.migestion.data.network.HttpRoutes
 import com.example.migestion.model.Product
 import com.example.migestion.model.Response
 import com.example.migestion.ui.components.MinimalDialog2
@@ -210,7 +211,7 @@ fun ProductCard(
                     )
                 }
             }
-            val painter = painterResource(id = R.drawable.patinete)
+            //val painter = painterResource(id = R.drawable.patinete)
             /*Image(
                 painter = painter, contentDescription = null,
                 contentScale = ContentScale.Crop,
@@ -220,7 +221,7 @@ fun ProductCard(
                     .clip(shape = RoundedCornerShape(16.dp))
             )*/
             AsyncImage(
-                model = "https://tuxiaomi.es/wp-content/uploads/2022/08/Xiaomi-Electric-Scooter-4-Pro-motor.png",
+                model = HttpRoutes.Image.GET + product.id + "/0",
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
