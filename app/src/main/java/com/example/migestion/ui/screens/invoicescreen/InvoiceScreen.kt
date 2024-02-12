@@ -52,22 +52,6 @@ fun Invoices(
     viewModel: InvoiceViewModel = hiltViewModel(),
     invoicesContent: @Composable (invoices: List<SelectInvoiceWithCustomer>) -> Unit
 ) {
-    //val lifecycleOwner = LocalLifecycleOwner.current
-    //val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
-
-    /*LaunchedEffect(lifecycleState) {
-
-        when (lifecycleState) {
-            Lifecycle.State.DESTROYED -> {}
-            Lifecycle.State.INITIALIZED -> {}
-            Lifecycle.State.CREATED -> {}
-            Lifecycle.State.STARTED -> {}
-            Lifecycle.State.RESUMED -> {
-                viewModel.onResume()
-            }
-        }
-    }*/
-
     when (val invoiceResponse = viewModel.invoiceResponse) {
         is Response.Loading -> ProgressBar()
         is Response.Success -> invoicesContent(invoiceResponse.data)
@@ -78,7 +62,7 @@ fun Invoices(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun InvoiceScreen(viewModel: InvoiceViewModel = hiltViewModel()) {
+fun InvoiceScreen(viewModel: InvoiceViewModel = hiltViewModel(), paddingValues: PaddingValues) {
 
     Invoices(viewModel = viewModel) { invoices ->
         val tabs = listOf("Facturas", "Albaranes", "Presupuestos")
@@ -86,7 +70,7 @@ fun InvoiceScreen(viewModel: InvoiceViewModel = hiltViewModel()) {
         val selectedTabIndex = remember { derivedStateOf { pagerState.currentPage } }
         val scope = rememberCoroutineScope()
 
-        Column(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.fillMaxWidth().padding(paddingValues)) {
             BarraBusqueda()
 
             Row(modifier = Modifier.padding(8.dp)) {
@@ -118,7 +102,6 @@ fun InvoiceScreen(viewModel: InvoiceViewModel = hiltViewModel()) {
                     }
                 }
             }
-
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier
@@ -127,7 +110,6 @@ fun InvoiceScreen(viewModel: InvoiceViewModel = hiltViewModel()) {
             ) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
                 ) {
                     InvoiceList(invoices = invoices)
                 }
@@ -174,16 +156,15 @@ fun InvoiceCard(invoice: SelectInvoiceWithCustomer) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(text = invoice.businessName, fontWeight = FontWeight.Medium)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = "156,32 €", fontWeight = FontWeight.SemiBold)
+                Text(text = invoice.totalPrice.toString(), fontWeight = FontWeight.SemiBold)
             }
             Column(
                 modifier = Modifier
                     .wrapContentWidth()
                     .fillMaxHeight(),
                 verticalArrangement = Arrangement.Center
-
             ) {
-                RoundedBlueText(true)
+                RoundedBlueText(invoice.paid)
             }
         }
 
@@ -193,7 +174,7 @@ fun InvoiceCard(invoice: SelectInvoiceWithCustomer) {
 
 @Composable
 fun RoundedBlueText(cobrado: Boolean) {
-    val backgroundColor = if (cobrado) BlueCobrado else NaranjaPendiente
+    val backgroundColor = if (cobrado) BlueCobrado else NaranjaPendiente.copy(alpha = 0.6f)
     val textToShow = if (cobrado) "Cobrado" else "Pendiente"
 
     Box(
@@ -216,5 +197,5 @@ fun RoundedBlueText(cobrado: Boolean) {
 @Preview(showBackground = true)
 @Composable
 fun InvoiceScreenPreview() {
-    InvoiceScreen()
+    //InvoiceScreen()
 }

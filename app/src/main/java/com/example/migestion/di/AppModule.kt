@@ -1,8 +1,16 @@
 package com.example.migestion.di
 
 import android.app.Application
+import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.preferencesDataStoreFile
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
+import com.example.migestion.data.Session
 import com.example.migestion.data.cache.AlbaranCache
 import com.example.migestion.data.cache.CustomerCache
 import com.example.migestion.data.cache.InvoiceCache
@@ -34,6 +42,7 @@ import com.example.migestion.usecases.UseCases
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.ktor.client.HttpClient
 import javax.inject.Singleton
@@ -47,8 +56,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideAuthRepository(httpClient: HttpClient): AuthRepository {
-        return AuthRepositoryImpl(httpClient)
+    fun provideAuthRepository(httpClient: HttpClient, session: Session): AuthRepository {
+        return AuthRepositoryImpl(httpClient, session)
     }
 
     @Provides
@@ -146,6 +155,21 @@ object AppModule {
     ) = UseCases(
         GetInvoiceWithCustomer(invoiceRepository, customerRepository)
     )
+
+
+    @Singleton
+    @Provides
+    fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
+        return PreferenceDataStoreFactory.create(
+            corruptionHandler = ReplaceFileCorruptionHandler(produceNewData = { emptyPreferences() }),
+            produceFile = { context.preferencesDataStoreFile(Session.DATA) })
+    }
+
+    @Provides
+    @Singleton
+    fun provideSession(dataStore: DataStore<Preferences>): Session {
+        return Session(dataStore)
+    }
 
 
 }

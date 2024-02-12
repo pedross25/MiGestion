@@ -115,6 +115,13 @@ dependencies {
 
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
+    //Datastore
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+
+    //Splashscreen
+    implementation ("androidx.core:core-splashscreen:1.0.1")
+
+
 }
 
 

@@ -10,5 +10,6 @@ data class CreateProductParams(
     val amount: Int,
     val description: String?,
     val template: Boolean,
+    val parentId: Int? = null,
     val invoice: Int? = null,
 )

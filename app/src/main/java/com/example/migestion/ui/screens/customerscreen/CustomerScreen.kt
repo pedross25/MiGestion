@@ -176,7 +176,6 @@ fun CustomerList(
                         shape = MaterialTheme.shapes.medium
                     )
             ) {
-                //AddClientFields(viewModel = viewModel)
             }
         }
     }

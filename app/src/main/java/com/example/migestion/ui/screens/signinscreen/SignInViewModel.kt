@@ -30,7 +30,7 @@ class SignInViewModel @Inject constructor(
                 }
 
                 is Response.Failure -> {
-                    _signInState.send(SignInState(isError = result.e.toString()))
+                    _signInState.send(SignInState(isError = result.e?.message))
                 }
             }
         }

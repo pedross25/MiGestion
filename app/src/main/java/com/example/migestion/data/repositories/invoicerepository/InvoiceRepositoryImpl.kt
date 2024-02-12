@@ -1,16 +1,10 @@
 package com.example.migestion.data.repositories.invoicerepository
 
-import android.util.Log
-import com.example.migestion.data.cache.InvoiceCache
-import com.example.migestion.data.db.CustomerEntity
 import com.example.migestion.data.db.InvoiceEntity
 import com.example.migestion.data.model.InvoiceParam
+import com.example.migestion.data.network.HttpRoutes
 import com.example.migestion.data.remote.model.ApiResponse
-import com.example.migestion.data.repositories.customerrepository.CustomerRepository
-import com.example.migestion.data.repositories.customerrepository.ICacheCustomer
-import com.example.migestion.data.repositories.customerrepository.IRemoteCustomer
 import com.example.migestion.model.Invoice
-import com.example.migestion.model.InvoiceCustomer
 import com.example.migestion.model.Response
 import com.example.migestion.model.toInvoice
 import com.example.migestion.model.toInvoiceEntity
@@ -19,14 +13,9 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
-import io.ktor.client.request.url
-import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
-import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -44,6 +33,8 @@ class InvoiceRepositoryImpl @Inject constructor(
         customer: Int,
         idPaymentMethod: Int,
         date: String,
+        paid: Boolean,
+        totalPrice: Double,
         finished: Boolean
     ): Response<Invoice> {
         return try {
@@ -51,21 +42,25 @@ class InvoiceRepositoryImpl @Inject constructor(
                 id = id.toLong(),
                 customer_id = customer.toLong(),
                 date = date,
-                payment_method_id = idPaymentMethod.toLong()
+                payment_method_id = idPaymentMethod.toLong(),
+                paid = paid,
+                total_price = totalPrice
             )
             invoiceDb.insertInvoice(
                 invoice
             )
             //Response.Success(invoice.toInvoice())
             if (finished) {
-                val message = httpClient.post("http://10.0.2.2:8080/invoice/create") {
+                val message = httpClient.post(HttpRoutes.Invoice.CREATE) {
                     contentType(ContentType.Application.Json)
                     setBody(
                         InvoiceParam(
                             id = id,
                             idCustomer = customer,
                             idAlbarans = idAlbarans,
-                            idPaymentMethod = idPaymentMethod
+                            idPaymentMethod = idPaymentMethod,
+                            paid = paid,
+                            totalPrice = totalPrice
                         )
                     )
                 }
@@ -83,7 +78,7 @@ class InvoiceRepositoryImpl @Inject constructor(
             if (invoices.isNotEmpty()) {
                 Response.Success(invoices.map { it.toInvoice() })
             } else {
-                val message = httpClient.get("http://10.0.2.2:8080/invoice/getAll") {
+                val message = httpClient.get(HttpRoutes.Invoice.GETALLL) {
                     contentType(ContentType.Application.Json)
                 }
                 withContext(Dispatchers.IO) {
@@ -104,11 +99,7 @@ class InvoiceRepositoryImpl @Inject constructor(
         return try {
             invoiceDb.getNextNum() + 1
         } catch (e: Exception) {
-            val next = getAllInvoices()
-            if (next is Response.Success)
-                return getNextId()
-            else
-                return 0
+            return 1
         }
     }
 

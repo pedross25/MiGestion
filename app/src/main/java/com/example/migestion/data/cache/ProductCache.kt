@@ -31,7 +31,8 @@ class ProductCache @Inject constructor(
                 template = productEntity.template,
                 description = productEntity.description,
                 invoice_id = productEntity.invoice_id,
-                id = productEntity.id
+                id = productEntity.id,
+                parent_id = productEntity.parent_id
             )
         }
     }

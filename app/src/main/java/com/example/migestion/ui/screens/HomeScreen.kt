@@ -114,7 +114,7 @@ fun BottomBarWithFabDem(navController: NavHostController) {
 
         },
     ) { innerPadding ->
-        HomeNavGraph(navController = navController)
+        HomeNavGraph(navController = navController, innerPadding)
         val bottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
         if (expanded) {
             ModalBottomSheet(onDismissRequest = { expanded = false }) {

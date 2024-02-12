@@ -24,7 +24,9 @@ class InvoiceCache @Inject constructor(
                 invoiceEntity.id,
                 invoiceEntity.date,
                 invoiceEntity.payment_method_id,
-                invoiceEntity.customer_id
+                invoiceEntity.customer_id,
+                invoiceEntity.paid,
+                invoiceEntity.total_price
             )
         }
     }

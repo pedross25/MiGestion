@@ -39,19 +39,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.migestion.model.Product
-import com.example.migestion.model.Response
-import com.example.migestion.ui.screens.selectproductsscreen.SelectProductViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MinimalDialog2(
+fun AddProductDialog(
     product: Product,
-    show: Boolean,
+    onAccept: (unitCost: String, quantity: Int, discount: Double, description: String) -> Unit,
     onDismissRequest: () -> Unit,
-    viewModel: SelectProductViewModel
 ) {
-    if (show) {
         var unitCost by remember { mutableStateOf(product.price.toString()) }
         var quantity by remember { mutableStateOf("1") }
         var discount by remember { mutableStateOf("0") }
@@ -184,12 +180,7 @@ fun MinimalDialog2(
                     Spacer(modifier = Modifier.padding(4.dp))
                     Button(
                         onClick = {
-                            viewModel.addProduct(
-                                unitCost = unitCost.toDouble(),
-                                quantity = quantity.toInt(),
-                                discount = discount.toDouble(),
-                                description = description
-                            )
+                            onAccept(unitCost, quantity.toInt(), discount.toDouble(), description)
                             onDismissRequest()
                         },
                         modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -200,7 +191,6 @@ fun MinimalDialog2(
                 }
             }
         }
-    }
 }
 
 @Preview(showBackground = true)

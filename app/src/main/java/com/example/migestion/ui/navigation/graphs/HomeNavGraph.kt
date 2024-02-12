@@ -1,5 +1,6 @@
 package com.example.migestion.ui.navigation.graphs
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -18,7 +19,7 @@ import com.example.migestion.ui.screens.invoicescreen.InvoiceScreen
 import com.example.migestion.ui.screens.selectproductsscreen.SelectProduct
 
 @Composable
-fun HomeNavGraph(navController: NavHostController) {
+fun HomeNavGraph(navController: NavHostController, padding: PaddingValues) {
     NavHost(
         navController = navController,
         route = Graph.HOME,
@@ -31,7 +32,7 @@ fun HomeNavGraph(navController: NavHostController) {
             CustomerScreen(onItemClick = {})
         }
         composable(route = BottomNavItem.InvoiceScreen.screen_route) {
-            InvoiceScreen()
+            InvoiceScreen(paddingValues = padding)
         }
         detailsNavGraph(navController = navController)
     }
@@ -39,34 +40,24 @@ fun HomeNavGraph(navController: NavHostController) {
 
 fun NavGraphBuilder.detailsNavGraph(navController: NavHostController) {
     navigation(
-        route = Graph.DETAILS,
-        startDestination = DetailsScreen.FormularioAltaCliente.route
+        route = Graph.DETAILS, startDestination = DetailsScreen.FormularioAltaCliente.route
     ) {
         composable(route = DetailsScreen.FormularioAltaCliente.route) {
-            /*ScreenContent(name = DetailsScreen.Information.route) {
-                    navController.navigate(DetailsScreen.Overview.route)
-                }*/
-            //ClientForm()
             CreateCustomerScreen(navController)
         }
         composable(route = DetailsScreen.Overview.route) {
-            /*ScreenContent(name = DetailsScreen.Overview.route) {
-                navController.popBackStack(
-                    route = DetailsScreen.Information.route,
-                    inclusive = false
-                )
-            }*/
-            CreateInvoiceScreen(navController)
+            CreateInvoiceScreen(onSelectProduct = {
+                navController.navigate(DetailsScreen.SelectProducts.route + "?invoiceId=$it")
+            }, onBack = { navController.popBackStack() })
         }
         composable(
-            route = DetailsScreen.SelectProducts.route,
-            arguments = listOf(navArgument("idInvoice") {
-                type = NavType.IntType
+            route = DetailsScreen.SelectProducts.route + "?invoiceId={invoiceId}",
+            arguments = listOf(navArgument("invoiceId") {
+                type = NavType.StringType
             })
         ) {
             SelectProduct(
-                idInvoice = it.arguments?.getInt("idInvoice") ?: 0,
-                navController = navController
+                onBack = { navController.popBackStack() }
             )
         }
         composable(route = DetailsScreen.CreateProduct.route) {

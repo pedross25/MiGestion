@@ -10,4 +10,6 @@ interface AuthRepository {
 
     suspend fun registerUser(email: String, password: String, nombre: String, avatar: String): Flow<Response<String>>
 
+    suspend fun isLoggin(): Boolean
+
 }

@@ -56,6 +56,7 @@ class ProductRepositoryImpl @Inject constructor(
             product.category,
             product.template,
             product.invoice,
+            product.parentId,
             persistApi
         )
     }
@@ -68,6 +69,7 @@ class ProductRepositoryImpl @Inject constructor(
         category: String,
         template: Boolean,
         invoice: Int?,
+        parentId: Int?,
         persistApi: Boolean
     ): Response<Product> {
         return try {
@@ -82,6 +84,8 @@ class ProductRepositoryImpl @Inject constructor(
                             amount = quantity,
                             description = description,
                             template = template,
+                            parentId = parentId,
+                            invoice = invoice
                         )
                     )
                 }
@@ -99,6 +103,7 @@ class ProductRepositoryImpl @Inject constructor(
                     category = category,
                     template = template,
                     description = description,
+                    parentId = parentId,
                     invoice = invoice,
                 )
                 productDb.insertProduct(
@@ -129,7 +134,7 @@ class ProductRepositoryImpl @Inject constructor(
     }
 
     // TODO Sacar la peticion a remote
-    override suspend fun getTemplateProducts(): Response<List<Product>> {
+    override suspend fun getTemplateProducts(): List<Product> {
         return try {
             var products = productDb.getTemplateProducts().map { it.toProduct() }
             if (products.isEmpty()) {
@@ -141,9 +146,9 @@ class ProductRepositoryImpl @Inject constructor(
                 }
                 products = productDb.getTemplateProducts().map { it.toProduct() }
             }
-            Response.Success(data = products)
+            return products
         } catch (e: Exception) {
-            Response.Failure(e)
+            return emptyList()
         }
     }
 

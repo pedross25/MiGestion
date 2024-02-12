@@ -14,6 +14,7 @@ data class Product(
     val template: Boolean = false,
     val description: String?,
     val invoice: Int? = null,
+    val parentId: Int? = null,
     var images: List<String>? = null
 )
 
@@ -27,6 +28,7 @@ fun ProductEntity.toProduct() = Product(
     createdAt = created_at,
     template = template,
     description = description,
+    parentId = parent_id?.toInt(),
     invoice = invoice_id?.toInt()
 )
 
@@ -39,5 +41,6 @@ fun Product.toProductEntity() = ProductEntity(
     created_at = createdAt,
     template = template,
     description = description,
+    parent_id = parentId?.toLong(),
     invoice_id = invoice?.toLong()
 )

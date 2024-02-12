@@ -22,6 +22,7 @@ interface ProductRepository {
         category: String,
         template: Boolean,
         invoice: Int?,
+        parentId: Int? = null,
         persistApi: Boolean = false
     ): Response<Product>
 
@@ -34,7 +35,7 @@ interface ProductRepository {
 
     suspend fun persistProductsFromInvoice(id: Int): Response<List<Product>>
 
-    suspend fun getTemplateProducts(): Response<List<Product>>
+    suspend fun getTemplateProducts(): List<Product>
 
     suspend fun getProductsFromInvoice(idInvoice: Int): Flow<Response<List<Product>>>
 

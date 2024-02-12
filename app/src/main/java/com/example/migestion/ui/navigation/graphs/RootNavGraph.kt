@@ -7,11 +7,11 @@ import androidx.navigation.compose.composable
 import com.example.migestion.ui.screens.HomeScreen
 
 @Composable
-fun RootNavigationGraph(navController: NavHostController) {
+fun RootNavigationGraph(navController: NavHostController, startDestination: String) {
     NavHost(
         navController = navController,
         route = Graph.ROOT,
-        startDestination = Graph.AUTHENTICATION       // cambiar por auth
+        startDestination = startDestination
     ) {
         authNavGraph(navController = navController)
         composable(route = Graph.HOME) {

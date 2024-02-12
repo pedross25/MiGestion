@@ -14,6 +14,8 @@ SELECT
     c.email,
     c.phoneNumber,
     c.cif,
+    i.total_price AS totalPrice,
+    i.paid,
     c.createdAt AS customer_createdAt
 FROM
     invoiceEntity i

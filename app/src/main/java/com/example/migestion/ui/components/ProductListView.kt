@@ -1,50 +1,30 @@
 package com.example.migestion.ui.components
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.migestion.R
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.example.migestion.data.network.HttpRoutes
 import com.example.migestion.model.Product
 import com.example.migestion.ui.theme.NaranjaPendiente
 
 @Composable
 fun ProductListView(product: Product) {
-    /*Card(
-        modifier = Modifier
-            .wrapContentHeight()
-            .fillMaxWidth()
-            .clickable {
-
-            },
-        shape = RoundedCornerShape(18.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White,
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 6.dp
-        )
-    ) {*/
         Row(
             modifier = Modifier
                 .padding(8.dp)
@@ -74,7 +54,7 @@ fun ProductListView(product: Product) {
                 )
                 Spacer(modifier = Modifier.padding(8.dp))
                 Text(
-                    text = product.price.toString() + " €",
+                    text = (product.price * product.amount).toString() + " €",
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 20.sp,
                     color = NaranjaPendiente
@@ -82,19 +62,23 @@ fun ProductListView(product: Product) {
 
             }
             Column {
-                val painter = painterResource(id = R.drawable.patinete)
-                Image(
-                    painter = painter, contentDescription = null,
+                val idImage: Int = product.parentId ?: product.id
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(HttpRoutes.Image.GET + idImage + "/0")
+                        .crossfade(enable = true)
+                        .build(),
+                    contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .clip(shape = RoundedCornerShape(16.dp))
                         .height(150.dp)
                         .widthIn(30.dp)
+       /*                 .width(120.dp)*/
+                        //.fillMaxWidth()
+                        .clip(shape = RoundedCornerShape(16.dp))
                 )
             }
         }
-
-    //}
 }
 
 @Preview(showBackground = true)

@@ -1,9 +1,13 @@
+import kotlin.Boolean;
+
 -- invoice.sq
 CREATE TABLE invoiceEntity (
     id INTEGER NOT NULL PRIMARY KEY,
     date TEXT DEFAULT CURRENT_TIMESTAMP,
     payment_method_id INTEGER REFERENCES paymentMethodEntity(id) ON DELETE CASCADE,
-    customer_id INTEGER REFERENCES customerEntity(id) ON DELETE CASCADE
+    customer_id INTEGER REFERENCES customerEntity(id) ON DELETE CASCADE,
+    paid INTEGER AS Boolean DEFAULT 0 NOT NULL,
+    total_price REAL NOT NULL
 );
 
 -- Obtener todas las facturas
@@ -16,8 +20,8 @@ SELECT * FROM invoiceEntity WHERE id = ?;
 
 -- Insertar una factura
 insert:
-INSERT INTO invoiceEntity (id, date, payment_method_id, customer_id)
-VALUES (?,?, ?, ?);
+INSERT INTO invoiceEntity (id, date, payment_method_id, customer_id, paid, total_price)
+VALUES (?,?, ?, ?, ?, ?);
 
 -- Actualizar los datos de una factura por ID
 update:

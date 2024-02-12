@@ -12,6 +12,8 @@ interface InvoiceRepository {
         customer: Int,
         idPaymentMethod: Int,
         date: String,
+        paid: Boolean,
+        totalPrice: Double,
         finished: Boolean = false
     ): Response<Invoice>
 
