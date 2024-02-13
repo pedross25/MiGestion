@@ -29,7 +29,7 @@ fun HomeNavGraph(navController: NavHostController, padding: PaddingValues) {
             DashboardScreen()
         }
         composable(route = BottomNavItem.Customers.screen_route) {
-            CustomerScreen(onItemClick = {})
+            CustomerScreen(paddingValues = padding, onItemClick = {})
         }
         composable(route = BottomNavItem.InvoiceScreen.screen_route) {
             InvoiceScreen(paddingValues = padding)

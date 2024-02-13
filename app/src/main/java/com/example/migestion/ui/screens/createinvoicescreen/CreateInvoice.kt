@@ -146,7 +146,8 @@ fun SelectCustomerToInvoice(
                     viewModel.onEvent(CreateInvoiceEvent.CloseSearch)
                 },
                     onSearch = { text -> viewModel.onEvent(CreateInvoiceEvent.SearchCustomer(text)) },
-                    onClearIconClick = { viewModel.onEvent(CreateInvoiceEvent.SearchCustomer("")) })
+                    onClearIconClick = { viewModel.onEvent(CreateInvoiceEvent.SearchCustomer("")) },
+                    onQueryChange = {})
             } else {
                 Text(
                     text = "CLIENTE",

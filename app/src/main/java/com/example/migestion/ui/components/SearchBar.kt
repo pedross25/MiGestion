@@ -146,6 +146,7 @@ fun OnlySearchBar() {
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun NewSearchBar(
+    onQueryChange: (String) -> Unit,
     onArrowIconClick: () -> Unit,
     onSearch: (text: String) -> Unit,
     onClearIconClick: () -> Unit
@@ -161,7 +162,10 @@ fun NewSearchBar(
 
     TextField(
         value = text,
-        onValueChange = { text = it },
+        onValueChange = {
+            text = it
+            onQueryChange(it)
+        },
         leadingIcon = {
             IconButton(onClick = { onArrowIconClick() }) {
                 Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Right Icon")

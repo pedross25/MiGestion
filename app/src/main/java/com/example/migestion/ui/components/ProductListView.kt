@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,60 +25,56 @@ import com.example.migestion.ui.theme.NaranjaPendiente
 
 @Composable
 fun ProductListView(product: Product) {
-        Row(
-            modifier = Modifier
-                .padding(8.dp)
-        ) {
-            Column {
-                Text(
-                    text = product.name,
-                    maxLines = 2,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 14.sp
-                )
-                Spacer(modifier = Modifier.padding(4.dp))
-                Text(
-                    text = product.price.toString() + "€",
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 16.sp,
-                )
-                Text(
-                    text = "Cantidad: " + product.amount,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 16.sp,
-                )
-                Text(
-                    text = "Descuento: 0 %",
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 16.sp,
-                )
-                Spacer(modifier = Modifier.padding(8.dp))
-                Text(
-                    text = (product.price * product.amount).toString() + " €",
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 20.sp,
-                    color = NaranjaPendiente
-                )
+    Row(
+        modifier = Modifier
+            .padding(16.dp)
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = product.name,
+                maxLines = 2,
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp
+            )
+            Spacer(modifier = Modifier.padding(4.dp))
+            Text(
+                text = product.price.toString() + " €",
+                fontWeight = FontWeight.Medium,
+                fontSize = 16.sp,
+            )
+            Text(
+                text = "Cantidad: " + product.amount,
+                fontWeight = FontWeight.Medium,
+                fontSize = 16.sp,
+            )
+            Text(
+                text = "Descuento: 0 %",
+                fontWeight = FontWeight.Medium,
+                fontSize = 16.sp,
+            )
+            Spacer(modifier = Modifier.padding(8.dp))
+            Text(
+                text = (product.price * product.amount).toString() + " €",
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 20.sp,
+                color = NaranjaPendiente
+            )
 
-            }
-            Column {
-                val idImage: Int = product.parentId ?: product.id
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(HttpRoutes.Image.GET + idImage + "/0")
-                        .crossfade(enable = true)
-                        .build(),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .height(150.dp)
-                        .widthIn(30.dp)
-       /*                 .width(120.dp)*/
-                        //.fillMaxWidth()
-                        .clip(shape = RoundedCornerShape(16.dp))
-                )
-            }
         }
+        val idImage: Int = product.parentId ?: product.id
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(HttpRoutes.Image.GET + idImage + "/0")
+                .crossfade(enable = true)
+                .build(),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .height(150.dp)
+                .width(150.dp)
+                .clip(shape = RoundedCornerShape(16.dp))
+        )
+    }
 }
 
 @Preview(showBackground = true)

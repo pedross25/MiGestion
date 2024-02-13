@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -58,7 +59,11 @@ import com.example.migestion.ui.components.BarraBusqueda
 import com.example.migestion.ui.components.ProgressBar
 
 @Composable
-fun CustomerScreen(viewModel: CustomerViewModel = hiltViewModel(), onItemClick: (String) -> Unit) {
+fun CustomerScreen(
+    viewModel: CustomerViewModel = hiltViewModel(),
+    onItemClick: (String) -> Unit,
+    paddingValues: PaddingValues
+) {
 
     Customers(viewModel = viewModel) {
         var showClientForm by remember { mutableStateOf(false) }
@@ -67,7 +72,7 @@ fun CustomerScreen(viewModel: CustomerViewModel = hiltViewModel(), onItemClick: 
             ClientForm()
         }
 
-        Column {
+        Column(modifier = Modifier.padding(paddingValues)) {
             BarraBusqueda()
             CustomerList(customers = it, viewModel = viewModel, onItemClick = {})
         }
@@ -118,7 +123,7 @@ fun CustomerList(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 70.dp)
+            .padding(16.dp)
     ) {
 
         Column(

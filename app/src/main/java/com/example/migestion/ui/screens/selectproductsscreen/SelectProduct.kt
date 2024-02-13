@@ -27,11 +27,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.migestion.model.Product
 import com.example.migestion.ui.components.AddProductDialog
 import com.example.migestion.ui.components.BottomBarButton
 import com.example.migestion.ui.components.NewSearchBar
 import com.example.migestion.ui.components.ProductCard
+import com.example.migestion.ui.components.ProgressBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,7 +41,7 @@ fun SelectProduct(
     onBack: () -> Unit, viewModel: SelectProductViewModel = hiltViewModel()
 ) {
 
-    val state = viewModel.state
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     // Muestra el dialogo para añadir productos
     state.selectedProduct?.let {
@@ -75,8 +77,9 @@ fun SelectProduct(
                     },
                     onClearIconClick = { viewModel.onEvent(SelectProductEvent.Search("")) },
                     onSearch = { text ->
-                        viewModel.onEvent(SelectProductEvent.Search(text))
-                    }
+                        //viewModel.onEvent(SelectProductEvent.Search(text))
+                    },
+                    onQueryChange = { text -> viewModel.onEvent(SelectProductEvent.Search(text)) }
                 )
             } else {
                 CenterAlignedTopAppBar(title = {
@@ -106,25 +109,23 @@ fun SelectProduct(
                 .fillMaxSize()
                 .background(color = Color(0xFF45697B).copy(alpha = 0.15F))
         ) {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(it)
-                    .padding(8.dp)
-            ) {
-                val productList: List<Product> = if (state.isSearchActive) {
-                    state.filteredProducts
-                } else {
-                    state.templateProducts
-                }
-
-                items(productList) { product ->
-                    ProductCard(
-                        product = product,
-                        onClick = { viewModel.onEvent(SelectProductEvent.OpenDialog(product = product)) })
+            if(state.isSearchActive) {
+                ProgressBar()
+            } else {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(it)
+                        .padding(8.dp)
+                ) {
+                    items(state.filteredProducts) { product ->
+                        ProductCard(
+                            product = product,
+                            onClick = { viewModel.onEvent(SelectProductEvent.OpenDialog(product = product)) })
+                    }
                 }
             }
         }

@@ -78,19 +78,9 @@ dependencies {
 
     implementation("androidx.navigation:navigation-compose:2.7.6")
 
-    //ktor client, serialization and logging
-    /*implementation ("io.ktor:ktor-client-android:1.5.0")
-    implementation ("io.ktor:ktor-client-serialization:1.5.0")*/
-    /*implementation ("io.ktor:ktor-client-logging-jvm:$ktorVersion")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.0-alpha01")
 
-    implementation("io.ktor:ktor-client-core:$ktorVersion")
-    implementation("io.ktor:ktor-client-android:$ktorVersion")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
-    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")*/
-    /*implementation ("io.ktor:ktor-client-core:$ktor_version")
-    implementation ("io.ktor:ktor-client-okhttp:$ktor_version")
-    implementation ("io.ktor:ktor-client-content-negotiation:$ktor_version")
-    implementation ("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")*/
+
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-android:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")

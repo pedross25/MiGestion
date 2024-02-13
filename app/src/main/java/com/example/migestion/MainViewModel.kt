@@ -21,6 +21,7 @@ class MainViewModel @Inject constructor(
     private val _startDestination = MutableStateFlow<String?>(null)
     val startDestination get() = _startDestination.asStateFlow()
 
+
     init {
         viewModelScope.launch {
             session.isUserLoggedIn().collect { isLogued ->

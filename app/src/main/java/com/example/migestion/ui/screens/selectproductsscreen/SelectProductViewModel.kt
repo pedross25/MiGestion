@@ -3,6 +3,7 @@ package com.example.migestion.ui.screens.selectproductsscreen
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,9 +11,16 @@ import com.example.migestion.data.repositories.productrepository.ProductReposito
 import com.example.migestion.model.Product
 import com.example.migestion.model.Response
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,82 +30,115 @@ class SelectProductViewModel @Inject constructor(
     private val productRepository: ProductRepository
 ) : ViewModel() {
 
-    var state by mutableStateOf(SelectProductState())
+    private var _uiState = MutableStateFlow(SelectProductState())
+    val uiState = _uiState.asStateFlow()
+
+    var searchQuery by mutableStateOf("")
         private set
 
     init {
         val id = savedStateHandle.get<String?>("invoiceId")
-        if (id != null) {
-            viewModelScope.launch {
-                state = state.copy(
-                    templateProducts = productRepository.getTemplateProducts(),
-                    id = id.toInt()
-                )
-                // TODO Que hacer con flow??
-                /*productRepository.getProductsFromInvoice(id.toInt()).collectLatest {
-                    when (it) {
-                        is Response.Failure -> {}
-                        Response.Loading -> {}
-                        is Response.Success -> {
-                            state = state.copy(addedProducts = it.data)
-                        }
-                    }
-                }*/
+        initialiseUiState(id)
+    }
+
+    @OptIn(FlowPreview::class)
+    fun initialiseUiState(id: String?) {
+        viewModelScope.launch {
+            if (id != null) {
+                _uiState.update { it.copy(isSearchActive = true, id = id.toInt()) }
+                val products = productRepository.getTemplateProducts()
+                _uiState.update {
+                    it.copy(
+                        templateProducts = products,
+                        filteredProducts = products,
+                        isSearchActive = false
+                    )
+                }
             }
         }
+
+        snapshotFlow { searchQuery }
+            .debounce(350L)
+            .onEach { query ->
+                if (query.isNotBlank()) {
+                    _uiState.update {
+                        it.copy(isSearchActive = true)
+                    }
+
+                    // TODO Sacar a caso de uso??
+                    val filteredList = _uiState.value.templateProducts.filter { product ->
+                        product.name.contains(query, ignoreCase = true)
+                    }
+
+                    _uiState.update {
+                        it.copy(filteredProducts = filteredList, isSearchActive = false)
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            filteredProducts = _uiState.value.templateProducts,
+                            isSearchActive = false
+                        )
+                    }
+                }
+            }.launchIn(viewModelScope)
     }
 
     fun onEvent(event: SelectProductEvent) {
         when (event) {
             is SelectProductEvent.AddProduct -> {
-                val productModify = state.selectedProduct?.copy(
-                    invoice = state.id,
+                val productModify = uiState.value.selectedProduct?.copy(
+                    invoice = uiState.value.id,
                     price = event.unitCost.toDouble(),
                     amount = event.quantity,
                     description = event.description,
                     template = false,
-                    parentId = state.selectedProduct!!.id
+                    parentId = uiState.value.selectedProduct!!.id
                 )
                 productModify?.let {
-                    val newList = state.addedProducts.toMutableList()
+                    val newList = uiState.value.addedProducts.toMutableList()
                     newList.add(productModify)
-                    state = state.copy(addedProducts = newList)
+                    _uiState.update {
+                        it.copy(addedProducts = newList)
+                    }
                 }
 
             }
 
             SelectProductEvent.FinishSelection -> {
                 viewModelScope.launch {
-                    state.addedProducts.forEach { product ->
+                    _uiState.value.addedProducts.forEach { product ->
                         productRepository.addProduct(product = product)
                     }
-                    state = state.copy(isSaved = true)
+                    _uiState.update {
+                        it.copy(isSaved = true)
+                    }
                 }
             }
 
             SelectProductEvent.CloseDialog -> {
-                state = state.copy(selectedProduct = null)
+                _uiState.update {
+                    it.copy(selectedProduct = null)
+                }
             }
 
             is SelectProductEvent.OpenDialog -> {
-                state = state.copy(selectedProduct = event.product)
-            }
-
-            is SelectProductEvent.Search -> {
-                viewModelScope.launch {
-                    state = if (event.text.isEmpty()) {
-                        state.copy(filteredProducts = state.templateProducts, isSearchActive = true)
-                    } else {
-                        val filteredList = state.templateProducts.filter { product ->
-                            product.name.contains(event.text, ignoreCase = true)
-                        }
-                        state.copy(filteredProducts = filteredList, isSearchActive = true)
-                    }
+                _uiState.update {
+                    it.copy(selectedProduct = event.product)
                 }
             }
 
             SelectProductEvent.CloseSearch -> {
-                state = state.copy(filteredProducts = emptyList(), isSearchActive = false)
+                _uiState.update {
+                    it.copy(
+                        filteredProducts = _uiState.value.templateProducts,
+                        isSearchActive = false
+                    )
+                }
+            }
+
+            is SelectProductEvent.Search -> {
+                searchQuery = event.text
             }
         }
     }

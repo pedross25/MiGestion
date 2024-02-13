@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.compose.rememberNavController
@@ -32,7 +33,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MiGestionTheme {
-                val startDestination by viewmodel.startDestination.collectAsState()
+                val startDestination by viewmodel.startDestination.collectAsStateWithLifecycle()
                 startDestination?.let {
                     RootNavigationGraph(navController = rememberNavController(), it)
                 }
