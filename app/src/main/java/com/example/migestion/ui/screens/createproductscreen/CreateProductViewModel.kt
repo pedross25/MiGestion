@@ -51,7 +51,12 @@ class CreateProductViewModel @Inject constructor(
         val list = productPhotos.value.toMutableList()
         list.addAll(imagesUri)
         productPhotos.value = list
+    }
 
+    fun deleteImage(imageUri: Uri) {
+        val list = productPhotos.value.toMutableList()
+        list.remove(imageUri)
+        productPhotos.value = list
     }
 
     //TODO Insertar categorias

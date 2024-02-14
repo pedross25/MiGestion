@@ -24,11 +24,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -238,7 +235,7 @@ fun ImageSelectorScreen(viewModel: CreateProductViewModel = hiltViewModel()) {
             items(viewModel.productPhotos.value) { uri ->
                 Box(
                     modifier = Modifier.combinedClickable(
-                        onClick = {  },
+                        onClick = { },
                         onLongClick = {
                             haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                             contextMenuPhotoId = uri
@@ -264,7 +261,8 @@ fun ImageSelectorScreen(viewModel: CreateProductViewModel = hiltViewModel()) {
         }
         if (contextMenuPhotoId != null) {
             PhotoActionsSheet(
-                onDismissSheet = { contextMenuPhotoId = null }
+                onDismissSheet = { contextMenuPhotoId = null },
+                onDelete = { viewModel.deleteImage(contextMenuPhotoId!!) }
             )
         }
     }
@@ -274,12 +272,13 @@ fun ImageSelectorScreen(viewModel: CreateProductViewModel = hiltViewModel()) {
 @Composable
 private fun PhotoActionsSheet(
     /*@Suppress("UNUSED_PARAMETER") photo: Photo,*/
-    onDismissSheet: () -> Unit
+    onDismissSheet: () -> Unit,
+    onDelete: () -> Unit
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismissSheet
     ) {
-        ListItem(
+        /*ListItem(
             headlineContent = { Text("Add to album") },
             leadingContent = { Icon(Icons.Default.Add, null) }
         )
@@ -290,10 +289,14 @@ private fun PhotoActionsSheet(
         ListItem(
             headlineContent = { Text("Share") },
             leadingContent = { Icon(Icons.Default.Share, null) }
-        )
+        )*/
         ListItem(
             headlineContent = { Text("Remove") },
-            leadingContent = { Icon(Icons.Default.Delete, null) }
+            leadingContent = { Icon(Icons.Default.Delete, null) },
+            modifier = Modifier.clickable {
+                onDelete()
+                onDismissSheet()
+            }
         )
     }
 }
