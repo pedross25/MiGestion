@@ -16,6 +16,15 @@ val Blue = Color(0XFF5C9CBC)
 val BlueInvoice = Color(0xFF45697B)
 
 val BlueCobrado = Color(0xff5C9CBC)
+
 val NaranjaPendiente = Color(0xFFEB8F24)
 
 val TextGray = Color(0xFF898484)
+
+val AzulDashboard = Color(0xFF9AC3D7)
+
+val AzulButtonDash = Color(0xFF568096)
+
+val AzulItemDash = Color(0xFF37474F)
+val AzulItem2Dash = Color(0xFF4992B5)
+val RojoGastos = Color(0xFFDF5F5F)

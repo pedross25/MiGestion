@@ -42,7 +42,7 @@ class SelectProductViewModel @Inject constructor(
     }
 
     @OptIn(FlowPreview::class)
-    fun initialiseUiState(id: String?) {
+    private fun initialiseUiState(id: String?) {
         viewModelScope.launch {
             if (id != null) {
                 _uiState.update { it.copy(isSearchActive = true, id = id.toInt()) }

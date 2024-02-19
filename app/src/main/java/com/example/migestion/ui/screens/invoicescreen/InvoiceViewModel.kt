@@ -1,6 +1,5 @@
 package com.example.migestion.ui.screens.invoicescreen
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -24,33 +23,16 @@ class InvoiceViewModel @Inject constructor(
         private set
 
     init {
+        subscribe()
         viewModelScope.launch {
             useCases.getInvoiceWithCustomer.invoke()
         }
-        subscribe()
     }
 
     private fun subscribe() = viewModelScope.launch {
         invoiceWithCustomer.getInvoiceWithProducts().collect{
             val response = it.sortedByDescending { it.invoice_id }
             invoiceResponse = Response.Success(data = response)
-            Log.i("MIGESTION_INVOICE_WITH_PRODUCT", response.size.toString())
         }
     }
-
-
-    /*private fun getInvoices() = viewModelScope.launch {
-    val response = useCases.getInvoiceWithCustomer()
-    if (response is Response.Success) {
-        val sortedList = response.data.sortedByDescending { it.invoice.id }
-        invoiceResponse = Response.Success(data = sortedList)
-    } else {
-        invoiceResponse = response
-    }
-}*/
-
-
-    /* fun refreshData() {
-         getInvoices()
-     }*/
 }

@@ -48,7 +48,7 @@ fun NavGraphBuilder.detailsNavGraph(navController: NavHostController) {
         composable(route = DetailsScreen.Overview.route) {
             CreateInvoiceScreen(onSelectProduct = {
                 navController.navigate(DetailsScreen.SelectProducts.route + "?invoiceId=$it")
-            }, onBack = { navController.popBackStack() })
+            }, onBack = { navController.navigateUp() })
         }
         composable(
             route = DetailsScreen.SelectProducts.route + "?invoiceId={invoiceId}",

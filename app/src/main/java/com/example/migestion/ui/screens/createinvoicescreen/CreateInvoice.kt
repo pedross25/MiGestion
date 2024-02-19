@@ -38,7 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.migestion.model.Customer
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.migestion.ui.components.BottomBarButton
 import com.example.migestion.ui.components.NewSearchBar
 import com.example.migestion.ui.components.ProductListView
@@ -51,9 +51,12 @@ fun CreateInvoiceScreen(
     onBack: () -> Unit,
     viewModel: CreateInvoiceViewModel = hiltViewModel()
 ) {
+
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        topBar = { Header(onBack, viewModel = viewModel) },
+        topBar = { Header(onBack, uiState) },
         bottomBar = {
             BottomBarButton("Crear") {
                 viewModel.onEvent(CreateInvoiceEvent.GenerateInvoice)
@@ -72,64 +75,58 @@ fun CreateInvoiceScreen(
                     .padding(it)
 
             ) {
-                SelectCustomerToInvoice(viewModel)
+                SelectCustomerToInvoice(viewModel, uiState)
                 Spacer(modifier = Modifier.padding(10.dp))
-                AlbaranInvoice(onSelectProduct = onSelectProduct, viewModel = viewModel)
+                AlbaranInvoice(onSelectProduct = onSelectProduct, uiState)
             }
         }
     }
 }
 
 @Composable
-fun Header(onBack: () -> Unit, viewModel: CreateInvoiceViewModel) {
-    Box(modifier = Modifier.background(color = Color.White)) {
-        Row(
+fun Header(onBack: () -> Unit, uiState: CreateInvoiceState) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(color = Color.White)
+            .height(60.dp)
+            .padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Icon(imageVector = Icons.Default.Clear,
+            contentDescription = null,
+            tint = Color.Black,
             modifier = Modifier
-                .fillMaxWidth()
-                .height(60.dp)
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(imageVector = Icons.Default.Clear,
-                contentDescription = null,
-                tint = Color.Black,
-                modifier = Modifier
-                    .padding(4.dp)
-                    .clickable {
-                        onBack()
-                    })
-            Spacer(modifier = Modifier.padding(8.dp))
-            Column {
-                Text(text = "Crear factura", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
-                Text(
-                    text = viewModel.state.currentDate,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Light,
-                    color = TextGray
-                )
-            }
-            Column(
-                horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.Bottom,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Text(
-                    text = "Invoice#" + viewModel.state.idInvoice,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Normal
-                )
-            }
+                .padding(4.dp)
+                .clickable {
+                    onBack()
+                })
+        Column(modifier = Modifier.weight(1f)) {
+            Text(text = "Crear factura", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
+            Text(
+                text = uiState.currentDate,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Light,
+                color = TextGray
+            )
         }
+        Text(
+            text = "Invoice#" + uiState.idInvoice,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Normal,
+            modifier = Modifier.align(Alignment.Bottom)
+        )
     }
 }
 
 @Composable
 fun SelectCustomerToInvoice(
-    viewModel: CreateInvoiceViewModel
+    viewModel: CreateInvoiceViewModel,
+    uiState: CreateInvoiceState
 ) {
     var expanded by remember { mutableStateOf(false) }
     var search by remember { mutableStateOf(false) }
-    val selectedCustomer = viewModel.state.selectCustomer
 
     Column(
         modifier = Modifier
@@ -147,7 +144,7 @@ fun SelectCustomerToInvoice(
                 },
                     onSearch = { text -> viewModel.onEvent(CreateInvoiceEvent.SearchCustomer(text)) },
                     onClearIconClick = { viewModel.onEvent(CreateInvoiceEvent.SearchCustomer("")) },
-                    onQueryChange = {})
+                    onQueryChange = { text -> viewModel.onEvent(CreateInvoiceEvent.SearchCustomer(text)) })
             } else {
                 Text(
                     text = "CLIENTE",
@@ -156,14 +153,14 @@ fun SelectCustomerToInvoice(
                     color = BlueInvoice
                 )
                 Spacer(modifier = Modifier.padding(8.dp))
-                Text(text = viewModel.state.selectCustomer?.businessName ?: "Seleccionar cliente",
+                Text(text = uiState.selectCustomer?.businessName ?: "Seleccionar cliente",
                     fontSize = 16.sp,
-                    fontWeight = if (selectedCustomer == null) {
+                    fontWeight = if (uiState.selectCustomer?.businessName == null) {
                         FontWeight.Normal
                     } else {
                         FontWeight.SemiBold
                     },
-                    color = if (selectedCustomer == null) {
+                    color = if (uiState.selectCustomer?.businessName == null) {
                         Color.Gray
                     } else {
                         Color.Black
@@ -188,12 +185,7 @@ fun SelectCustomerToInvoice(
         }
         AnimatedVisibility(visible = expanded) {
             LazyColumn {
-                val customerList: List<Customer> = if (viewModel.state.isSearchingCustomer) {
-                    viewModel.state.filteredList
-                } else {
-                    viewModel.state.customerList
-                }
-                items(customerList) { customer ->
+                items(uiState.filteredList) { customer ->
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -214,6 +206,14 @@ fun SelectCustomerToInvoice(
                         )
                     }
                 }
+                /*if (viewModel.uiState..isNotEmpty()) {
+                    val errorMessage = stringResource(uiState.errorMessageIds.first())
+
+                    LaunchedEffect(errorMessage, snackbarHostState) {
+                        snackbarHostState.showSnackbar(message = errorMessage)
+                        onDismissError(uiState.errorMessageIds.first())
+                    }
+                }*/
             }
         }
     }
@@ -221,7 +221,7 @@ fun SelectCustomerToInvoice(
 
 @Composable
 fun AlbaranInvoice(
-    onSelectProduct: (String) -> Unit, viewModel: CreateInvoiceViewModel
+    onSelectProduct: (String) -> Unit, uiState: CreateInvoiceState
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -251,13 +251,13 @@ fun AlbaranInvoice(
                 contentDescription = "Añadir albaran",
                 tint = Color.Gray,
                 modifier = Modifier.clickable {
-                    onSelectProduct(viewModel.state.idInvoice.toString())
+                    onSelectProduct(uiState.idInvoice.toString())
                 })
         }
 
         AnimatedVisibility(visible = expanded) {
             LazyColumn {
-                items(viewModel.state.productList) { product ->
+                items(uiState.productList) { product ->
                     ProductListView(product)
                 }
             }

@@ -16,5 +16,4 @@ class InvoiceWithCustomerCache @Inject constructor(
     fun getInvoiceWithProducts(): Flow<List<SelectInvoiceWithCustomer>> {
         return queries.selectInvoiceWithCustomer().asFlow().mapToList(Dispatchers.IO)
     }
-
 }

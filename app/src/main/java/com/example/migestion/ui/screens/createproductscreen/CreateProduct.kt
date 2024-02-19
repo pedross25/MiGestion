@@ -1,10 +1,12 @@
 package com.example.migestion.ui.screens.createproductscreen
 
+import android.annotation.SuppressLint
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -13,6 +15,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -34,6 +37,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -52,6 +56,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -61,10 +66,57 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.example.migestion.R
+import com.example.migestion.ui.components.Header
+import com.kizitonwose.calendar.compose.HorizontalCalendar
+import com.kizitonwose.calendar.compose.VerticalCalendar
+import com.kizitonwose.calendar.compose.rememberCalendarState
+import com.kizitonwose.calendar.core.CalendarDay
+import com.kizitonwose.calendar.core.CalendarMonth
+import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
+import java.time.YearMonth
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun CreateProduct(navController: NavController) {
-    Column {
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            Header(
+                title = stringResource(R.string.create_product_title),
+                leftIcon = Icons.Default.Close,
+                {})
+        }, content = {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(it)
+                    .background(color = Color(0xFF45697B).copy(alpha = 0.15F))
+            ) {
+                val currentMonth = remember { YearMonth.now() }
+                val startMonth = remember { currentMonth.minusMonths(100) } // Adjust as needed
+                val endMonth = remember { currentMonth.plusMonths(100) } // Adjust as needed
+                val firstDayOfWeek = remember { firstDayOfWeekFromLocale() } // Available from the library
+
+                val state = rememberCalendarState(
+                    startMonth = startMonth,
+                    endMonth = endMonth,
+                    firstVisibleMonth = currentMonth,
+                    firstDayOfWeek = firstDayOfWeek
+                )
+
+                VerticalCalendar(
+                    state = state,
+                    dayContent = { Day(it) }
+                )
+
+            }
+
+        }
+    )
+
+    /*Column {
         Header(navController)
         Surface(
             modifier = Modifier
@@ -84,10 +136,21 @@ fun CreateProduct(navController: NavController) {
             }
         }
         BottomCreateProduct()
-    }
+    }*/
 }
 
 @Composable
+fun Day(day: CalendarDay) {
+    Box(
+        modifier = Modifier
+            .aspectRatio(1f), // This is important for square sizing!
+        contentAlignment = Alignment.Center
+    ) {
+        Text(text = day.date.dayOfMonth.toString())
+    }
+}
+
+/*@Composable
 fun Header(navController: NavController) {
     Row(
         modifier = Modifier
@@ -107,7 +170,7 @@ fun Header(navController: NavController) {
         Spacer(modifier = Modifier.padding(8.dp))
         Text(text = "Crear producto", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
     }
-}
+}*/
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -271,25 +334,12 @@ fun ImageSelectorScreen(viewModel: CreateProductViewModel = hiltViewModel()) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PhotoActionsSheet(
-    /*@Suppress("UNUSED_PARAMETER") photo: Photo,*/
     onDismissSheet: () -> Unit,
     onDelete: () -> Unit
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismissSheet
     ) {
-        /*ListItem(
-            headlineContent = { Text("Add to album") },
-            leadingContent = { Icon(Icons.Default.Add, null) }
-        )
-        ListItem(
-            headlineContent = { Text("Add to favorites") },
-            leadingContent = { Icon(Icons.Default.FavoriteBorder, null) }
-        )
-        ListItem(
-            headlineContent = { Text("Share") },
-            leadingContent = { Icon(Icons.Default.Share, null) }
-        )*/
         ListItem(
             headlineContent = { Text("Remove") },
             leadingContent = { Icon(Icons.Default.Delete, null) },
@@ -345,7 +395,6 @@ fun ExposedDropdownMenuSample() {
 @Composable
 fun BottomCreateProduct(
     viewModel: CreateProductViewModel = hiltViewModel()
-    /*navController: NavController*/
 ) {
     Box(
         modifier = Modifier

@@ -3,20 +3,24 @@ package com.example.migestion.ui.screens.createinvoicescreen
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.migestion.core.getFormattedCurrentDate
 import com.example.migestion.data.repositories.customerrepository.CustomerRepository
 import com.example.migestion.data.repositories.invoicerepository.InvoiceRepository
 import com.example.migestion.data.repositories.productrepository.ProductRepository
-import com.example.migestion.model.Product
 import com.example.migestion.model.Response
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Locale
+import okhttp3.internal.toImmutableList
 import javax.inject.Inject
 
 @HiltViewModel
@@ -26,56 +30,97 @@ class CreateInvoiceViewModel @Inject constructor(
     private val productRepository: ProductRepository,
 ) : ViewModel() {
 
-    var state by mutableStateOf(CreateInvoiceState())
+    private var _uiState = MutableStateFlow(CreateInvoiceState())
+    val uiState = _uiState.asStateFlow()
+
+    var searchQuery by mutableStateOf("")
         private set
 
     init {
+        initializeUiState()
+    }
+
+    private fun initializeUiState() {
         viewModelScope.launch {
-            state = state.copy(currentDate = getFormattedCurrentDate())
+            _uiState.update { it.copy(currentDate = getFormattedCurrentDate()) }
         }
         getNumInvoice()
         getCustomers()
         getProducts()
+
+        snapshotFlow { searchQuery }
+            .debounce(350L)
+            .onEach { query ->
+                if (query.isNotBlank()) {
+                    _uiState.update {
+                        it.copy(isSearchingCustomer = true)
+                    }
+
+                    // TODO Sacar a caso de uso
+                    val filteredList = _uiState.value.customerList.filter { customer ->
+                        customer.businessName.contains(query, ignoreCase = true)
+                    }
+
+                    _uiState.update {
+                        it.copy(filteredList = filteredList, isSearchingCustomer = false)
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            filteredList = _uiState.value.customerList,
+                            isSearchingCustomer = false
+                        )
+                    }
+                }
+            }.launchIn(viewModelScope)
     }
 
     fun onEvent(event: CreateInvoiceEvent) {
         when (event) {
             is CreateInvoiceEvent.SearchCustomer -> {
-                state = if (event.text.isEmpty()) {
-                    state.copy(filteredList = state.customerList, isSearchingCustomer = true)
-                } else {
-                    val filteredList = state.customerList.filter { customer ->
-                        customer.businessName.contains(event.text, ignoreCase = true)
+                searchQuery = event.text
+                /*_uiState.update {
+                    if (event.text.isEmpty()) {
+                        it.copy(
+                            filteredList = uiState.value.customerList,
+                            isSearchingCustomer = true
+                        )
+                    } else {
+                        val filteredList = uiState.value.customerList.filter { customer ->
+                            customer.businessName.contains(event.text, ignoreCase = true)
+                        }
+                        it.copy(filteredList = filteredList, isSearchingCustomer = true)
                     }
-                    state.copy(filteredList = filteredList, isSearchingCustomer = true)
-                }
+                }*/
             }
 
-            CreateInvoiceEvent.CloseSearch -> state =
-                state.copy(filteredList = emptyList(), isSearchingCustomer = false)
+            CreateInvoiceEvent.CloseSearch -> _uiState.update {
+                it.copy(filteredList = uiState.value.customerList, isSearchingCustomer = false)
+            }
 
-            is CreateInvoiceEvent.SelectCustomer -> state =
-                state.copy(selectCustomer = event.customer)
+            is CreateInvoiceEvent.SelectCustomer -> _uiState.update {
+                it.copy(selectCustomer = event.customer)
+            }
 
             //TODO HACER QUE ESPERE A QUE TERMINE EL PROCESO PARA VOLVER ATRAS?
             CreateInvoiceEvent.GenerateInvoice -> {
                 viewModelScope.launch {
                     var totalPrice = 0.0
-                    state.productList.forEach { product ->
+                    uiState.value.productList.forEach { product ->
                         totalPrice += (product.amount * product.price)
                     }
-                    if (state.idInvoice != null && state.selectCustomer != null) {
+                    if (uiState.value.idInvoice != null && uiState.value.selectCustomer != null) {
                         invoiceRepository.createInvoice(
-                            state.idInvoice!!,
+                            uiState.value.idInvoice!!,
                             listOf(),
-                            state.selectCustomer!!.id,
+                            uiState.value.selectCustomer!!.id,
                             1,
                             getFormattedCurrentDate(),
                             finished = true,
                             paid = false,
                             totalPrice = totalPrice
                         )
-                        productRepository.persistProductsFromInvoice(state.idInvoice!!)
+                        productRepository.persistProductsFromInvoice(uiState.value.idInvoice!!)
                     }
                 }
             }
@@ -83,23 +128,56 @@ class CreateInvoiceViewModel @Inject constructor(
     }
 
     private fun getCustomers() = viewModelScope.launch {
-        val customerList = customerRepository.getAll()
-        if (customerList is Response.Success) {
-            state = state.copy(customerList = customerList.data)
-        }
-    }
-
-    private fun getNumInvoice() = viewModelScope.launch {
-        state = state.copy(idInvoice = invoiceRepository.getNextId())
-    }
-
-    private fun getProducts() = viewModelScope.launch {
-        state.idInvoice?.let {
-            productRepository.getProductsFromInvoice(it).collectLatest { products ->
-                if (products is Response.Success) {
-                    state = state.copy(productList = products.data)
+        when (val customerList = customerRepository.getAll()) {
+            is Response.Failure -> TODO()
+            Response.Loading -> TODO()
+            is Response.Success -> {
+                _uiState.update {
+                    it.copy(
+                        customerList = customerList.data,
+                        filteredList = customerList.data
+                    )
                 }
             }
         }
     }
+
+    private fun getNumInvoice() = viewModelScope.launch {
+        _uiState.update { it.copy(idInvoice = invoiceRepository.getNextId()) }
+    }
+
+    /*private fun getProducts() = viewModelScope.launch {
+        _uiState.value.idInvoice?.let {
+            productRepository.getProductsFromInvoice(it).onEach { productsResult ->
+                when (productsResult) {
+                    is Response.Success -> {
+                        val products = productsResult.data.toImmutableList()
+                        _uiState.update {
+                            it.copy(productList = products)
+                        }
+                    }
+
+                    is Response.Failure -> {}
+                    Response.Loading -> {}
+                }
+            }
+        }
+    }*/
+
+    private fun getProducts() = viewModelScope.launch {
+        _uiState.value.idInvoice?.let {
+            productRepository.getProductsFromInvoice(it).collectLatest { productsResult ->
+                when(productsResult) {
+                    is Response.Failure -> {}
+                    Response.Loading -> {}
+                    is Response.Success -> {
+                        _uiState.update {
+                            it.copy(productList = productsResult.data)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }

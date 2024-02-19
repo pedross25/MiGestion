@@ -1,5 +1,7 @@
 package com.example.migestion.ui.navigation.graphs
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -11,7 +13,9 @@ fun RootNavigationGraph(navController: NavHostController, startDestination: Stri
     NavHost(
         navController = navController,
         route = Graph.ROOT,
-        startDestination = startDestination
+        startDestination = startDestination,
+        enterTransition = { EnterTransition.None },
+        exitTransition = { ExitTransition.None }
     ) {
         authNavGraph(navController = navController)
         composable(route = Graph.HOME) {

@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">MiGestion</string>
+
+    <string name="create_product_title">Crear producto</string>
 </resources>
