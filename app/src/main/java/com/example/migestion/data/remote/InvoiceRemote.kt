@@ -1,6 +1,7 @@
 package com.example.migestion.data.remote
 
 import com.example.migestion.data.model.InvoiceParam
+import com.example.migestion.data.network.HttpRoutes
 import com.example.migestion.data.repositories.invoicerepository.IRemoteInvoice
 import com.example.migestion.data.repositories.invoicerepository.InvoiceResponse
 import com.example.migestion.model.Invoice
@@ -18,7 +19,7 @@ class InvoiceRemote @Inject constructor(
     private val httpClient: HttpClient,
 ) : IRemoteInvoice {
     override suspend fun createInvoice(invoiceParam: InvoiceParam): Invoice? {
-        val message = httpClient.post("http://10.0.2.2:8080/invoice/create") {
+        val message = httpClient.post(HttpRoutes.Invoice.CREATE) {
             contentType(ContentType.Application.Json)
             setBody(invoiceParam)
         }
@@ -26,7 +27,7 @@ class InvoiceRemote @Inject constructor(
     }
 
     override suspend fun getAll(): List<Invoice> {
-        val message = httpClient.get("http://10.0.2.2:8080/invoice/getAll") {
+        val message = httpClient.get(HttpRoutes.Invoice.GETALL) {
             contentType(ContentType.Application.Json)
         }
         return message.body()

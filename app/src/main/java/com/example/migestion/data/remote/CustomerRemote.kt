@@ -49,21 +49,6 @@ class CustomerRemote @Inject constructor(
                 ))
             }
             message.body<ApiResponse<ApiCustomer>>().data.map()
-            /*val message = httpClient.post<ApiResponse<ApiCustomer>> {
-                url(HttpRoutes.Customer.CREATE)
-                contentType(ContentType.Application.Json)
-                body = CustomerParam(
-                    businessName = name,
-                    streetAddress = streetAddress,
-                    city = city,
-                    state = state,
-                    postalCode = postalCode,
-                    email = email,
-                    phoneNumber = phoneNumber,
-                    cif = cif
-                )
-            }
-            message.data.map()*/
         } catch (e: RedirectResponseException) {
             // 3xx - responses
             println("Error: ${e.response.status.description}")

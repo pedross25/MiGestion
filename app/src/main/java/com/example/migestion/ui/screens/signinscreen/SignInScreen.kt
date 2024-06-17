@@ -64,9 +64,8 @@ fun SignInScreen(
             },
             modifier = Modifier.fillMaxWidth(),
             colors = TextFieldDefaults.textFieldColors(
-                /*  backgroundColor = lightBlue,*/
                 cursorColor = Color.Black,
-                /* disabledLabelColor = lightBlue,*/ unfocusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
                 focusedIndicatorColor = Color.Transparent
             ), shape = RoundedCornerShape(8.dp), singleLine = true, placeholder = {
                 Text(text = "Email")
@@ -118,7 +117,6 @@ fun SignInScreen(
             onClick = {
                onSignUpClick()
             }
-            /*fontFamily = RegularFont*/
         )
         LaunchedEffect(key1 = state.value?.isSuccess) {
             scope.launch {

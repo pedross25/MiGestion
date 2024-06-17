@@ -26,7 +26,7 @@ fun HomeNavGraph(navController: NavHostController, padding: PaddingValues) {
         startDestination = BottomNavItem.Dashboard.screen_route
     ) {
         composable(route = BottomNavItem.Dashboard.screen_route) {
-            DashboardScreen()
+            DashboardScreen(padding)
         }
         composable(route = BottomNavItem.Customers.screen_route) {
             CustomerScreen(paddingValues = padding, onItemClick = {})
@@ -69,7 +69,7 @@ fun NavGraphBuilder.detailsNavGraph(navController: NavHostController) {
 sealed class DetailsScreen(val route: String) {
     object FormularioAltaCliente : DetailsScreen(route = "FORMULARIO")
     object Overview : DetailsScreen(route = "OVERVIEW")
-    object CreateProduct : DetailsScreen(route = "create_product")
+    object CreateProduct : DetailsScreen(route = "CREATEPRODUCT")
 
     object SelectProducts : DetailsScreen(route = "SELECCIONAR PRODUCTOS/{idInvoice}") {
         fun crearRoute(idInvoice: Int): String {

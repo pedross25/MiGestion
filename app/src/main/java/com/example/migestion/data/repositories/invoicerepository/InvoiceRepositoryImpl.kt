@@ -78,7 +78,7 @@ class InvoiceRepositoryImpl @Inject constructor(
             if (invoices.isNotEmpty()) {
                 Response.Success(invoices.map { it.toInvoice() })
             } else {
-                val message = httpClient.get(HttpRoutes.Invoice.GETALLL) {
+                val message = httpClient.get(HttpRoutes.Invoice.GETALL) {
                     contentType(ContentType.Application.Json)
                 }
                 withContext(Dispatchers.IO) {

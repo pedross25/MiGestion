@@ -1,5 +1,6 @@
 package com.example.migestion.ui.screens.signupscreen
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,16 +27,15 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpScreen(
-    viewModel: SignUpViewModel = hiltViewModel()
+    viewModel: SignUpViewModel = hiltViewModel(),
+    onSignInClick: () -> Unit
 ) {
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var nombre by rememberSaveable { mutableStateOf("") }
     var avatar by rememberSaveable { mutableStateOf("") }
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
     //val state = viewModel.signUpState.collectAsState(initial = null)
-
 
     Column(
         modifier = Modifier
@@ -49,13 +49,11 @@ fun SignUpScreen(
             text = "Create Account",
             fontWeight = FontWeight.Bold,
             fontSize = 35.sp,
-            /*fontFamily = RegularFont,*/
         )
         Text(
             text = "Enter your credential's to register",
             fontWeight = FontWeight.Medium,
             fontSize = 15.sp, color = Color.Gray,
-            /*fontFamily = RegularFont,*/
 
         )
         TextField(
@@ -82,9 +80,7 @@ fun SignUpScreen(
             modifier = Modifier.fillMaxWidth(),
             value = password,
             colors = TextFieldDefaults.textFieldColors(
-                /*    backgroundColor = lightBlue,*/
                 cursorColor = Color.Black,
-                /* disabledLabelColor = lightBlue,*/
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent
             ),
@@ -145,10 +141,8 @@ fun SignUpScreen(
                 .fillMaxWidth()
                 .padding(top = 20.dp, start = 30.dp, end = 30.dp),
             colors = ButtonDefaults.buttonColors(
-                //backgroundColor = Color.Black,
                 contentColor = Color.White
             ),
-            /*shape = RoundedCornerShape(15.dp)*/
         ) {
             Text(
                 text = "Sign up",
@@ -166,14 +160,14 @@ fun SignUpScreen(
             modifier = Modifier
                 .padding(15.dp)
                 .clickable {
-                    //navController.navigate(AppScreens.SignInScreen.route)
+                    onSignInClick()
                 },
             text = "Already Have an account? sign In",
-            fontWeight = FontWeight.Bold, color = Color.Black/*, fontFamily = RegularFont*/
+            fontWeight = FontWeight.Bold, color = Color.Black
         )
     }
-/*
-    LaunchedEffect(key1 = state.value?.isSuccess) {
+
+    /*LaunchedEffect(key1 = state.value?.isSuccess) {
         scope.launch {
             if (state.value?.isSuccess?.isNotEmpty() == true) {
                 val success = state.value?.isSuccess
@@ -192,7 +186,7 @@ fun SignUpScreen(
                 Toast.makeText(context, "$error", Toast.LENGTH_LONG).show()
             }
         }
-    }
-    */
+    }*/
+
 
 }

@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,10 +49,33 @@ fun Header(title: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(start = 16.dp, end = 16.dp)
             .height(60.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Text(text = title, fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
+        Icon(imageVector = Icons.Default.Menu,
+            contentDescription = null,
+            tint = Color.Black,
+            modifier = Modifier
+                .padding(4.dp)
+                .clickable {
+
+                })
+
+        Text(
+            text = title,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.weight(1f)
+        )
+        /*Icon(imageVector = Icons.Default.MoreVert,
+            contentDescription = null,
+            tint = Color.Black,
+            modifier = Modifier
+                .padding(4.dp)
+                .clickable {
+
+                })*/
     }
 }

@@ -45,7 +45,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.8"
+        kotlinCompilerExtensionVersion = "1.5.10"
     }
     packaging {
         resources {
@@ -75,7 +75,7 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     implementation("androidx.navigation:navigation-compose:2.7.7")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.0-alpha01")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.0-alpha02")
     // Ktor
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-android:$ktorVersion")
@@ -88,7 +88,7 @@ dependencies {
     //Hilt
     implementation ("com.google.dagger:hilt-android:2.50")
     kapt ("com.google.dagger:hilt-compiler:2.50")
-    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
     // Coil
     implementation("io.coil-kt:coil-compose:2.5.0")
     //Datastore

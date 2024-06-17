@@ -10,9 +10,9 @@ import com.example.migestion.ui.screens.signupscreen.SignUpScreen
 fun NavGraphBuilder.authNavGraph(navController: NavHostController) {
     navigation(
         route = Graph.AUTHENTICATION,
-        startDestination = AuthScreen.Login.route
+        startDestination = AuthScreen.SignIn.route
     ) {
-        composable(route = AuthScreen.Login.route) {
+        composable(route = AuthScreen.SignIn.route) {
             SignInScreen(
                 onSignInClick = {
                     navController.popBackStack()
@@ -22,30 +22,16 @@ fun NavGraphBuilder.authNavGraph(navController: NavHostController) {
                     navController.navigate(AuthScreen.SignUp.route)
                 }
             )
-            /*LoginContent(
-                onClick = {
-                    navController.popBackStack()
-                    navController.navigate(Graph.HOME)
-                },
-                onSignUpClick = {
-                    navController.navigate(AuthScreen.SignUp.route)
-                },
-                onForgotClick = {
-                    navController.navigate(AuthScreen.Forgot.route)
-                }
-            )*/
         }
         composable(route = AuthScreen.SignUp.route) {
-            SignUpScreen()
-        }
-        composable(route = AuthScreen.Forgot.route) {
-            //ScreenContent(name = AuthScreen.Forgot.route) {}
+            SignUpScreen(onSignInClick = {
+                navController.navigate(AuthScreen.SignIn.route)
+            })
         }
     }
 }
 
 sealed class AuthScreen(val route: String) {
-    object Login : AuthScreen(route = "LOGIN")
+    object SignIn : AuthScreen(route = "SIGN_IN")
     object SignUp : AuthScreen(route = "SIGN_UP")
-    object Forgot : AuthScreen(route = "FORGOT")
 }

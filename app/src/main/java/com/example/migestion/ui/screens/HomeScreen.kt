@@ -103,8 +103,8 @@ fun BottomBarWithFabDem(navController: NavHostController) {
                         contentColor = Color.Black,
                         modifier = Modifier
                             .align(Alignment.Center)
-                            .size(65.dp)
-                            .offset(y = 55.dp)
+                            .size(55.dp)
+                            .offset(y = 75.dp)
                             .border(2.dp, color = Color.White, CircleShape)
                     ) {
                         Icon(imageVector = Icons.Filled.Add, contentDescription = "Add icon")

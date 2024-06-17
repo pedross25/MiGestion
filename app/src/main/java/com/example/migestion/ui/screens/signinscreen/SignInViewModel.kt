@@ -35,5 +35,4 @@ class SignInViewModel @Inject constructor(
             }
         }
     }
-
 }

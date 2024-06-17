@@ -55,8 +55,6 @@ fun CreateCustomerScreen(navController: NavController) {
             color = Color(0xFF45697B).copy(alpha = 0.15F)
         ) {
             ClientForm1()
-
-
         }
         //BottomCreateCustomer()
 
@@ -75,15 +73,13 @@ fun CustomerHeader(navController: NavController) {
     ) {
         Icon(
             imageVector = Icons.Default.ArrowBack,
-            contentDescription = null, // ContentDescription puede ser nulo si el icono es puramente decorativo
-            tint = Color.Black, // Puedes ajustar el color de la cruz según tus necesidades
+            contentDescription = null,
+            tint = Color.Black,
             modifier = Modifier
-                .padding(4.dp) // Puedes ajustar el espacio alrededor del icono
-                //.fillMaxSize() // Ocupará el tamaño máximo disponible
+                .padding(4.dp)
+                //.fillMaxSize()
                 .clickable {
                     navController.popBackStack()
-                    // Acción al hacer clic en el icono (en este caso, volver atrás)
-                    //onBack.invoke()
                 }
         )
         Spacer(modifier = Modifier.padding(8.dp))
@@ -98,22 +94,19 @@ fun CustomerHeader(navController: NavController) {
 
         Icon(
             imageVector = Icons.Default.Check,
-            contentDescription = null, // ContentDescription puede ser nulo si el icono es puramente decorativo
-            tint = Color.Black, // Puedes ajustar el color de la cruz según tus necesidades
+            contentDescription = null,
+            tint = Color.Black,
             modifier = Modifier
-                .padding(4.dp) // Puedes ajustar el espacio alrededor del icono
-                //.fillMaxSize() // Ocupará el tamaño máximo disponible
+                .padding(4.dp)
+                //.fillMaxSize()
                 .clickable {
                     navController.popBackStack()
-                    // Acción al hacer clic en el icono (en este caso, volver atrás)
-                    //onBack.invoke()
                 }
         )
 
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ClientForm1() {
     var name by remember { mutableStateOf("") }
@@ -135,7 +128,6 @@ fun ClientForm1() {
             .padding(32.dp)
             .fillMaxSize()
     ) {
-        // Name field
         OutlinedTextField(
             value = name,
             onValueChange = {
@@ -157,7 +149,6 @@ fun ClientForm1() {
                 .padding(bottom = 8.dp)
         )
 
-        // Email field
         OutlinedTextField(
             value = email,
             onValueChange = {
@@ -178,8 +169,6 @@ fun ClientForm1() {
                 .fillMaxWidth()
                 .padding(bottom = 8.dp)
         )
-
-        // Optional fields
 
         optionalFields.forEachIndexed { index, field ->
             Row(
@@ -211,7 +200,6 @@ fun ClientForm1() {
 
                 IconButton(
                     onClick = {
-                        // Eliminar campo opcional
                         optionalFields = optionalFields.toMutableList().apply {
                             removeAt(index)
                         }
@@ -222,7 +210,6 @@ fun ClientForm1() {
             }
         }
 
-        // Botón para agregar campo opcional
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -231,7 +218,6 @@ fun ClientForm1() {
         ) {
             IconButton(
                 onClick = {
-                    // Mostrar diálogo para agregar nuevo campo opcional
                     isAddingField = true
                 }
             ) {
@@ -239,25 +225,19 @@ fun ClientForm1() {
             }
         }
 
-        // Mostrar diálogo para agregar nuevo campo opcional
         if (isAddingField) {
             AddOptionalFieldDialog(
                 onDismiss = {
-                    // Restablecer el índice seleccionado
                     selectedFieldIndex = -1
-                    // Cerrar el teclado si estaba abierto
                     keyboardController?.hide()
-                    // Restablecer el estado de agregar campo
                     isAddingField = false
                 },
                 onAddField = { newField ->
                     optionalFields = if (selectedFieldIndex != -1) {
-                        // Editar el campo existente
                         optionalFields.toMutableList().apply {
                             set(selectedFieldIndex, newField)
                         }
                     } else {
-                        // Agregar nuevo campo
                         optionalFields + newField
                     }
                 },

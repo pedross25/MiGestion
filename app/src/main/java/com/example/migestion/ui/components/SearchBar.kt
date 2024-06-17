@@ -16,6 +16,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarColors
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -106,6 +108,8 @@ fun OnlySearchBar() {
     SearchBar(query = searchQuery,
         onQueryChange = { searchQuery = it },
         onSearch = {},
+        shape = RoundedCornerShape(12.dp),
+        colors = SearchBarDefaults.colors(containerColor = Color.White),
         active = isSearchActive,
         onActiveChange = { isSearchActive = it },
         modifier = Modifier

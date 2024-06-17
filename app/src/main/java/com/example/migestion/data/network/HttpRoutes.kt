@@ -1,7 +1,7 @@
 package com.example.migestion.data.network
 
 object HttpRoutes {
-    private const val BASE_URL = "http://5.250.187.56:8080"
+    private const val BASE_URL = "http://93.93.115.184:8080"
 
     object Auth {
         private const val BASE_AUTH = "$BASE_URL/auth"
@@ -30,6 +30,6 @@ object HttpRoutes {
     object Invoice {
         private const val BASE_INVOICE = "$BASE_URL/invoice"
         const val CREATE = "$BASE_INVOICE/create"
-        const val GETALLL = "$BASE_INVOICE/getAll"
+        const val GETALL = "$BASE_INVOICE/getAll"
     }
 }
